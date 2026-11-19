@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
     instantInsights: {
       validationLevel: 'manual-warning',
     },
+    // Prevent transient .next/lock removal from racing with Vercel output/cache tracing
+    lockDistDir: !process.env.VERCEL && !process.env.CI,
   },
   cacheComponents: true,
   partialPrefetching: true,
