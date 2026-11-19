@@ -1,0 +1,40 @@
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import { brandConfig } from '@/config/brand.config';
+import './globals.css';
+
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+});
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
+
+export const metadata: Metadata = {
+  title: {
+    default: brandConfig.seo.defaultTitle,
+    template: brandConfig.seo.titleTemplate,
+  },
+  description: brandConfig.seo.description,
+  keywords: brandConfig.seo.keywords,
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col bg-[#FAF9F6] text-slate-900">
+        {children}
+      </body>
+    </html>
+  );
+}
