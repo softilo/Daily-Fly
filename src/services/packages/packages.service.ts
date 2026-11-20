@@ -78,7 +78,7 @@ export async function getSinglePackage(
   return ('data' in raw && raw.data ? raw.data : raw) as TourPackage;
 }
 
-export async function createPackage(payload: {
+export interface UpsertPackagePayload {
   category?: ServiceCategory;
   title: string;
   destination: string;
@@ -93,7 +93,23 @@ export async function createPackage(payload: {
   validFrom?: string;
   validUntil?: string;
   notes?: string;
-}): Promise<{ success: boolean; message: string; data?: TourPackage }> {
+  isArchived?: boolean;
+}
+
+function revalidatePackageRoutes(id?: string): void {
+  revalidatePath('/dashboard/packages');
+  revalidatePath('/packages');
+  if (id) {
+    revalidatePath(`/packages/${id}`);
+    revalidatePath(`/dashboard/packages/${id}/edit`);
+  }
+  revalidatePath('/');
+  revalidatePath('/sitemap.xml');
+}
+
+export async function createPackage(
+  payload: UpsertPackagePayload,
+): Promise<{ success: boolean; message: string; data?: TourPackage }> {
   const res = await serverFetch.post('/packages', {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -107,36 +123,99 @@ export async function createPackage(payload: {
     };
   }
 
-  revalidatePath('/dashboard/packages');
-  revalidatePath('/packages');
-  revalidatePath('/');
+  const created = (
+    body && typeof body === 'object' && 'data' in body && body.data
+      ? body.data
+      : body
+  ) as TourPackage;
+
+  revalidatePackageRoutes(created?.id);
 
   return {
     success: true,
     message: 'Package created successfully',
-    data: body as TourPackage,
+    data: created,
+  };
+}
+
+export async function updatePackage(
+  id: string,
+  payload: Partial<UpsertPackagePayload>,
+): Promise<{ success: boolean; message: string; data?: TourPackage }> {
+  const res = await serverFetch.patch(`/packages/${id}`, {
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const body = await res.json().catch(() => null);
+  if (!res.ok) {
+    return {
+      success: false,
+      message: body?.message || 'Failed to update package',
+    };
+  }
+
+  const updated = (
+    body && typeof body === 'object' && 'data' in body && body.data
+      ? body.data
+      : body
+  ) as TourPackage;
+
+  revalidatePackageRoutes(id);
+
+  return {
+    success: true,
+    message: 'Package updated successfully',
+    data: updated,
+  };
+}
+
+export async function togglePackageVisibility(
+  id: string,
+  nextIsArchived: boolean,
+): Promise<{ success: boolean; message: string }> {
+  // Primary update path uses PATCH /packages/:id
+  const patchRes = await serverFetch.patch(`/packages/${id}`, {
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ isArchived: nextIsArchived }),
+  });
+
+  if (patchRes.ok) {
+    revalidatePackageRoutes(id);
+    return {
+      success: true,
+      message: nextIsArchived
+        ? 'Package unpublished and hidden from website'
+        : 'Package published and live on website',
+    };
+  }
+
+  // Fallback for unpublishing when backend restricts `isArchived` updates to DELETE
+  if (nextIsArchived) {
+    const deleteRes = await serverFetch.delete(`/packages/${id}`);
+    if (deleteRes.ok) {
+      revalidatePackageRoutes(id);
+      return {
+        success: true,
+        message: 'Package unpublished and hidden from website',
+      };
+    }
+    const delBody = await deleteRes.json().catch(() => null);
+    return {
+      success: false,
+      message: delBody?.message || 'Failed to unpublish package',
+    };
+  }
+
+  const patchBody = await patchRes.json().catch(() => null);
+  return {
+    success: false,
+    message: patchBody?.message || 'Failed to update package visibility',
   };
 }
 
 export async function archivePackage(
   id: string,
 ): Promise<{ success: boolean; message: string }> {
-  const res = await serverFetch.delete(`/packages/${id}`);
-  const body = await res.json().catch(() => null);
-
-  if (!res.ok) {
-    return {
-      success: false,
-      message: body?.message || 'Failed to archive package',
-    };
-  }
-
-  revalidatePath('/dashboard/packages');
-  revalidatePath('/packages');
-  revalidatePath('/');
-
-  return {
-    success: true,
-    message: 'Package archived successfully',
-  };
+  return togglePackageVisibility(id, true);
 }

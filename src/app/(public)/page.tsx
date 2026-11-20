@@ -32,7 +32,7 @@ export default async function PublicHomePage() {
   ]);
 
   const packages = (packagesRes?.data || [])
-    .filter((pkg) => isPackageCategory(pkg.category))
+    .filter((pkg) => !pkg.isArchived && isPackageCategory(pkg.category))
     .slice(0, 6);
   const countries = countriesRes?.data || [];
 

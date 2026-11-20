@@ -222,9 +222,11 @@ export async function proxy(request: NextRequest) {
   const isProtectedApi = PROTECTED_API_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
-  const isAdminOnlyRoute = ADMIN_ONLY_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-  );
+  const isAdminOnlyRoute =
+    ADMIN_ONLY_PREFIXES.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+    ) ||
+    (pathname.startsWith('/dashboard/packages/') && pathname.endsWith('/edit'));
   const isPrivateRoute =
     isProtectedPage || isProtectedApi || isSecretPortal || isAuthApiRoute;
 

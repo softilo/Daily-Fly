@@ -32,7 +32,7 @@ export async function generateMetadata({
     getLiveBrandInfo(),
   ]);
 
-  if (!pkg) {
+  if (!pkg || pkg.isArchived) {
     return buildPageMetadata({
       title: 'Package Not Found',
       description: 'Requested travel package could not be found.',
@@ -75,7 +75,7 @@ export default async function PublicPackageDetailsPage({
     getLiveBrandInfo(),
   ]);
 
-  if (!pkg) {
+  if (!pkg || pkg.isArchived) {
     notFound();
   }
 

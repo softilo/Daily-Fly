@@ -100,8 +100,8 @@ export default async function PublicPackagesPage({
     search: resolved.search,
   });
 
-  const filteredPackages = (packagesRes.data || []).filter((pkg) =>
-    isPackageCategory(pkg.category),
+  const filteredPackages = (packagesRes.data || []).filter(
+    (pkg) => !pkg.isArchived && isPackageCategory(pkg.category),
   );
 
   const packageSectors = PACKAGE_CATEGORIES.map((key) => SECTOR_CATALOG[key]);
