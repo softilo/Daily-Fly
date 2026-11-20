@@ -7,6 +7,7 @@ import { getPackages } from '@/services/packages/packages.service';
 import { getAdminVisaServicesAction } from '@/services/visa/visa.service';
 import { isPackageCategory } from '@/config/brand.config';
 import { LeadWorkspaceClient } from '@/components/module/leads/LeadWorkspaceClient';
+import { MarkLeadNotificationsRead } from '@/components/module/dashboard/MarkLeadNotificationsRead';
 
 
 export const instant = false;
@@ -35,6 +36,7 @@ export default async function LeadDetailsPage({
 
   return (
     <div className="space-y-4">
+      <MarkLeadNotificationsRead leadId={lead.id} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <Link

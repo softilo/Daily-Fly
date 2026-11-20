@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { DASHBOARD_NAV_ITEMS } from '@/lib/navItem.config';
 import { StaffRole } from '@/types/api';
+import { useNotifications } from '@/components/providers/NotificationsProvider';
 import { Logo } from '@/components/shared/Logo';
 import { cn } from '@/lib/utils';
 
@@ -54,6 +55,8 @@ export function NavIcon({ name, className }: { name: string; className?: string 
 
 export function DashboardSidebar({ role }: { role: StaffRole }) {
   const pathname = usePathname();
+  const { data: notifications } = useNotifications();
+  const { counts } = notifications;
   const visibleItems = DASHBOARD_NAV_ITEMS.filter((item) =>
     item.roles.includes(role),
   );
@@ -94,27 +97,53 @@ export function DashboardSidebar({ role }: { role: StaffRole }) {
                   : pathname === item.href ||
                     pathname.startsWith(`${item.href}/`);
 
+                const badgeCount =
+                  item.href === '/dashboard/visa-immigration/inquiries'
+                    ? counts.unreadWebInquiries
+                    : item.href === '/dashboard/leads'
+                      ? counts.overdueFollowUps + counts.newLeadsNeedingAction
+                      : item.href === '/dashboard'
+                        ? counts.totalUnread
+                        : 0;
+
+                const isWebBadge =
+                  item.href === '/dashboard/visa-immigration/inquiries';
+
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     title={item.description}
                     className={cn(
-                      'group flex items-center gap-3 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors',
+                      'group flex items-center justify-between gap-2 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors',
                       isActive
                         ? 'bg-[#0A3A23] font-semibold text-[#F7D29E]'
                         : 'text-slate-300 hover:bg-white/10 hover:text-white',
                     )}
                   >
-                    <NavIcon
-                      name={item.icon}
-                      className={cn(
-                        isActive
-                          ? 'text-[#D9822B]'
-                          : 'text-slate-400 group-hover:text-white',
-                      )}
-                    />
-                    <span className="truncate">{item.title}</span>
+                    <span className="flex min-w-0 items-center gap-3">
+                      <NavIcon
+                        name={item.icon}
+                        className={cn(
+                          isActive
+                            ? 'text-[#D9822B]'
+                            : 'text-slate-400 group-hover:text-white',
+                        )}
+                      />
+                      <span className="truncate">{item.title}</span>
+                    </span>
+                    {badgeCount > 0 && (
+                      <span
+                        className={cn(
+                          'shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none tabular-nums',
+                          isWebBadge
+                            ? 'bg-[#D9822B] text-white'
+                            : 'bg-white/15 text-[#F7D29E]',
+                        )}
+                      >
+                        {badgeCount > 99 ? '99+' : badgeCount}
+                      </span>
+                    )}
                   </Link>
                 );
               })}

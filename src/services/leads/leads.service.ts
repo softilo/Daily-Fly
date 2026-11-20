@@ -562,6 +562,9 @@ export async function submitPublicInquiry(payload: {
     };
   }
 
+  revalidatePath('/dashboard/leads');
+  revalidatePath('/dashboard');
+
   return {
     success: true,
     message: 'Assessment & inquiry submitted!',

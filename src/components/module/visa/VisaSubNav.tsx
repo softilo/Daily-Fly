@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ExternalLink, FileCheck2, Globe, Inbox, MapPin, Plus } from 'lucide-react';
+import { useNotifications } from '@/components/providers/NotificationsProvider';
 import { cn } from '@/lib/utils';
 
 const VISA_TABS = [
@@ -35,6 +36,8 @@ const VISA_TABS = [
 
 export function VisaSubNav() {
   const pathname = usePathname();
+  const { data: notifications } = useNotifications();
+  const unreadWebInquiries = notifications.counts.unreadWebInquiries;
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-stone-200/90 bg-white p-2.5 shadow-2xs">
@@ -44,6 +47,8 @@ export function VisaSubNav() {
             ? pathname === tab.href
             : pathname === tab.href || pathname.startsWith(`${tab.href}/`);
           const Icon = tab.icon;
+          const isInquiriesTab =
+            tab.href === '/dashboard/visa-immigration/inquiries';
 
           return (
             <Link
@@ -58,6 +63,18 @@ export function VisaSubNav() {
             >
               <Icon className="h-3.5 w-3.5" />
               <span>{tab.label}</span>
+              {isInquiriesTab && unreadWebInquiries > 0 && (
+                <span
+                  className={cn(
+                    'rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none tabular-nums',
+                    isActive
+                      ? 'bg-white/25 text-white'
+                      : 'bg-[#D9822B] text-white',
+                  )}
+                >
+                  {unreadWebInquiries}
+                </span>
+              )}
             </Link>
           );
         })}

@@ -131,6 +131,7 @@ export async function submitVisaInquiry(payload: {
     };
   }
 
+  revalidatePath('/dashboard');
   revalidatePath('/dashboard/visa-immigration');
   revalidatePath('/dashboard/visa-immigration/inquiries');
   revalidatePath('/dashboard/leads');

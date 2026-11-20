@@ -24,7 +24,7 @@ const ADMIN_ONLY_PREFIXES = [
 ];
 
 const PROTECTED_PAGE_PREFIXES = ['/dashboard', '/my-profile', '/change-password'];
-const PROTECTED_API_PREFIXES = ['/api/quotations'];
+const PROTECTED_API_PREFIXES = ['/api/quotations', '/api/dashboard'];
 const HIDDEN_PUBLIC_AUTH_PROBES = ['/login', '/signin', '/admin', '/staff-login'];
 
 interface ProxySessionResult {

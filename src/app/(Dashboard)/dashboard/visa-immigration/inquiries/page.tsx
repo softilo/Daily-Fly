@@ -4,6 +4,10 @@ import { requireStaffSession } from '@/services/auth/getMe';
 import { getAdminVisaInquiriesAction } from '@/services/visa/visa.service';
 import { VisaCategoryBadge } from '@/components/module/visa/VisaStatusBadges';
 import { VisaSubNav } from '@/components/module/visa/VisaSubNav';
+import {
+  InquiriesReadBanner,
+  InquiryUnreadBadge,
+} from '@/components/module/visa/InquiriesReadBanner';
 import SearchFilter from '@/components/shared/SearchFilter';
 import SelectFilter from '@/components/shared/SelectFilter';
 import TablePagination from '@/components/shared/TablePagination';
@@ -48,6 +52,8 @@ export default async function AdminVisaInquiriesPage({
         </Link>
       </div>
 
+      <InquiriesReadBanner total={meta.total} />
+
       {/* Filters */}
       <div className="flex flex-col gap-3 rounded-2xl border border-stone-200/90 bg-white p-4 shadow-2xs sm:flex-row sm:items-center sm:justify-between">
         <div className="flex-1">
@@ -70,7 +76,7 @@ export default async function AdminVisaInquiriesPage({
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-2xs">
+      <div className="overflow-x-auto rounded-2xl border border-stone-200/90 bg-white shadow-2xs">
         <table className="min-w-full divide-y divide-stone-200 text-left text-sm">
           <thead className="bg-[#FAF9F6] text-[11px] font-bold uppercase tracking-wider text-stone-500">
             <tr>
@@ -93,7 +99,12 @@ export default async function AdminVisaInquiriesPage({
               inquiries.map((inq: VisaInquiry) => (
                 <tr key={inq.id} className="hover:bg-[#FAF9F6]/70">
                   <td className="px-4 py-3">
-                    <div className="font-semibold text-slate-900">{inq.fullName}</div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-semibold text-slate-900">
+                        {inq.fullName}
+                      </span>
+                      <InquiryUnreadBadge inquiryId={inq.id} leadId={inq.leadId} />
+                    </div>
                     <div className="text-xs text-stone-500">
                       {inq.phone} {inq.email ? `• ${inq.email}` : ''}
                     </div>

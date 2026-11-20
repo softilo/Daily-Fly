@@ -9,6 +9,8 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { LogoutBtn } from '@/components/shared/LogoutBtn';
 import { DASHBOARD_NAV_ITEMS } from '@/lib/navItem.config';
 import { NavIcon } from './DashboardSidebar';
+import { NotificationBell } from './NotificationBell';
+import { useNotifications } from '@/components/providers/NotificationsProvider';
 import { Logo } from '@/components/shared/Logo';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +19,8 @@ export function DashboardNavbar({ user }: { user: StaffUser }) {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [quickQuery, setQuickQuery] = useState('');
+  const { data: notifications } = useNotifications();
+  const { counts } = notifications;
 
   const visibleItems = DASHBOARD_NAV_ITEMS.filter((item) =>
     item.roles.includes(user.role),
@@ -90,6 +94,7 @@ export function DashboardNavbar({ user }: { user: StaffUser }) {
         </form>
 
         <div className="flex shrink-0 items-center gap-2">
+          <NotificationBell />
           <Link
             href="/my-profile"
             className="flex items-center gap-2 whitespace-nowrap rounded-xl border border-gray-200/90 bg-gray-50/70 px-2.5 py-1.5 transition hover:bg-gray-100"
@@ -144,23 +149,36 @@ export function DashboardNavbar({ user }: { user: StaffUser }) {
                   ? pathname === item.href
                   : pathname === item.href ||
                     pathname.startsWith(`${item.href}/`);
+                const badgeCount =
+                  item.href === '/dashboard/visa-immigration/inquiries'
+                    ? counts.unreadWebInquiries
+                    : item.href === '/dashboard/leads'
+                      ? counts.overdueFollowUps + counts.newLeadsNeedingAction
+                      : 0;
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
-                      'flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-medium',
+                      'flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-xs font-medium',
                       isActive
                         ? 'bg-[#0A3A23] font-semibold text-[#F7D29E]'
                         : 'text-slate-300 hover:bg-white/10',
                     )}
                   >
-                    <NavIcon
-                      name={item.icon}
-                      className={isActive ? 'text-[#D9822B]' : 'text-slate-400'}
-                    />
-                    <span>{item.title}</span>
+                    <span className="flex min-w-0 items-center gap-3">
+                      <NavIcon
+                        name={item.icon}
+                        className={isActive ? 'text-[#D9822B]' : 'text-slate-400'}
+                      />
+                      <span className="truncate">{item.title}</span>
+                    </span>
+                    {badgeCount > 0 && (
+                      <span className="shrink-0 rounded-full bg-[#D9822B] px-1.5 py-0.5 text-[10px] font-bold leading-none text-white tabular-nums">
+                        {badgeCount > 99 ? '99+' : badgeCount}
+                      </span>
+                    )}
                   </Link>
                 );
               })}

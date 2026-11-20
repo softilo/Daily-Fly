@@ -4,6 +4,7 @@ import { ExternalLink, Plus } from 'lucide-react';
 import { requireStaffSession } from '@/services/auth/getMe';
 import { getVisaAdminOverviewAction } from '@/services/visa/visa.service';
 import { VisaSubNav } from '@/components/module/visa/VisaSubNav';
+import { UnreadWebInquiriesInlinePill } from '@/components/module/visa/InquiriesReadBanner';
 
 export const instant = false;
 
@@ -100,9 +101,14 @@ export default async function VisaImmigrationOverviewPage() {
             href={item.href}
             className="rounded-2xl border border-stone-200/90 bg-white p-5 shadow-2xs transition hover:border-teal-300 hover:shadow-sm"
           >
-            <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">
-              {item.label}
-            </p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-stone-500">
+                {item.label}
+              </p>
+              {item.href === '/dashboard/visa-immigration/inquiries' && (
+                <UnreadWebInquiriesInlinePill />
+              )}
+            </div>
             <p className="mt-2 text-3xl font-extrabold text-slate-900 tabular-nums">{item.value}</p>
           </Link>
         ))}

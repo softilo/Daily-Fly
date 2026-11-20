@@ -3,6 +3,7 @@ import { requireStaffSession } from '@/services/auth/getMe';
 import { getDashboardSummary } from '@/services/dashboard/dashboard.service';
 import { getLeads } from '@/services/leads/leads.service';
 import { ManagementPageHeader } from '@/components/shared/ManagementPageHeader';
+import { DashboardActionAlertsBanner } from '@/components/module/dashboard/DashboardActionAlertsBanner';
 import { StatCard } from '@/components/ui/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -48,6 +49,8 @@ export default async function DashboardOverviewPage() {
           <Button variant="outline">All Leads →</Button>
         </Link>
       </ManagementPageHeader>
+
+      <DashboardActionAlertsBanner />
 
       {/* Top KPI Cards (Clickable to jump straight to filtered queues) */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
