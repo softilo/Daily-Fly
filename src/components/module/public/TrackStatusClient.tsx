@@ -9,6 +9,9 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Copy,
+  Mail,
+  MapPin,
+  Phone,
   Rocket,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -412,6 +415,29 @@ export function TrackStatusClient() {
             </Card>
           </div>
         )}
+
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-200/80 bg-white px-5 py-3.5 text-xs text-gray-600">
+          <div className="flex flex-wrap items-center gap-4">
+            <a
+              href={`tel:${brand.phone.replace(/\s+/g, '')}`}
+              className="inline-flex items-center gap-1.5 font-semibold text-[#0A3A23] hover:text-[#D9822B]"
+            >
+              <Phone className="h-3.5 w-3.5 text-[#D9822B]" />
+              {brand.phone}
+            </a>
+            <a
+              href={`mailto:${brand.email}`}
+              className="inline-flex items-center gap-1.5 font-semibold text-[#0A3A23] hover:text-[#D9822B]"
+            >
+              <Mail className="h-3.5 w-3.5 text-[#D9822B]" />
+              {brand.email}
+            </a>
+          </div>
+          <span className="inline-flex items-center gap-1.5 text-gray-500">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D9822B]" />
+            {brand.address}
+          </span>
+        </div>
       </div>
     </div>
   );

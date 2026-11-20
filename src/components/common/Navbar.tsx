@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, Phone, Search, X } from 'lucide-react';
+import { Mail, MapPin, Menu, Phone, Search, X } from 'lucide-react';
 import { Logo } from '@/components/shared/Logo';
 import { Button } from '@/components/ui/button';
 import { useBrand } from '@/components/providers/BrandProvider';
@@ -35,6 +35,31 @@ export function Navbar() {
 
   return (
     <>
+      <div className="hidden border-b border-white/10 bg-[#062416] text-xs text-slate-200 md:block">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-4">
+            <a
+              href={`tel:${cleanPhone}`}
+              className="inline-flex shrink-0 items-center gap-1.5 font-medium transition hover:text-[#F7D29E]"
+            >
+              <Phone className="h-3.5 w-3.5 text-[#D9822B]" />
+              <span>{brand.phone}</span>
+            </a>
+            <a
+              href={`mailto:${brand.email}`}
+              className="inline-flex min-w-0 items-center gap-1.5 truncate font-medium transition hover:text-[#F7D29E]"
+            >
+              <Mail className="h-3.5 w-3.5 shrink-0 text-[#D9822B]" />
+              <span className="truncate">{brand.email}</span>
+            </a>
+          </div>
+          <div className="flex min-w-0 items-center gap-1.5 text-slate-300">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#D9822B]" />
+            <span className="max-w-md truncate">{brand.address}</span>
+          </div>
+        </div>
+      </div>
+
       <header
         className={cn(
           'sticky top-0 z-40 w-full transition-all duration-300',
@@ -157,7 +182,7 @@ export function Navbar() {
             </div>
 
             <div className="space-y-2 border-t border-gray-100 bg-[#F9FAFB] p-4 text-xs text-gray-600">
-              <p className="font-semibold text-[#0A3A23]">Need Immediate Help?</p>
+              <p className="font-semibold text-[#0A3A23]">Direct Office Contact</p>
               <a
                 href={`tel:${cleanPhone}`}
                 className="flex items-center justify-center gap-1.5 rounded-xl bg-[#D9822B] px-3 py-2.5 font-bold text-white shadow-xs hover:bg-[#BF6F1E]"
@@ -165,6 +190,17 @@ export function Navbar() {
                 <Phone className="h-3.5 w-3.5 fill-white" />
                 Call {brand.phone}
               </a>
+              <a
+                href={`mailto:${brand.email}`}
+                className="flex items-center gap-1.5 truncate rounded-xl border border-gray-200 bg-white px-3 py-2 font-medium text-gray-700 hover:text-[#0A3A23]"
+              >
+                <Mail className="h-3.5 w-3.5 shrink-0 text-[#D9822B]" />
+                <span className="truncate">{brand.email}</span>
+              </a>
+              <p className="flex items-start gap-1.5 px-1 text-[11px] leading-relaxed text-gray-500">
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D9822B]" />
+                <span>{brand.address}</span>
+              </p>
               <Link
                 href="/contact"
                 onClick={() => setMobileOpen(false)}

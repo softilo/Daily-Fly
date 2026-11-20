@@ -9,7 +9,7 @@ import { FeaturesSection } from '@/components/module/Home/FeaturesSection';
 import { PackagePreviewCard } from '@/components/common/PackagePreviewCard';
 import { CountryCoverageBadge } from '@/components/module/visa/VisaStatusBadges';
 import { Button } from '@/components/ui/button';
-import { brandConfig, isPackageCategory } from '@/config/brand.config';
+import { isPackageCategory } from '@/config/brand.config';
 import { Country } from '@/types/api';
 
 export const instant = false;
@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return buildPageMetadata({
     title: brand.agencyName,
     absoluteTitle: `${brand.agencyName} | ${brand.tagline}`,
-    description: brandConfig.seo.description,
+    description: `${brand.agencyName} — Trusted agency for Air Ticket Booking, Visa Assistance, Europe Work Permits, Student Visas, and Hajj & Umrah packages. Located at ${brand.address}. Call ${brand.phone}.`,
     path: '/',
     siteName: brand.agencyName,
   });

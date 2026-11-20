@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
 import { Globe, Landmark, Layers, Palmtree } from 'lucide-react';
 import { getPackages } from '@/services/packages/packages.service';
+import { getLiveBrandInfo } from '@/services/settings/settings.service';
 import { PackagePreviewCard } from '@/components/common/PackagePreviewCard';
 import { JsonLd } from '@/components/shared/JsonLd';
 import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
@@ -30,21 +31,24 @@ interface PublicPackagesPageProps {
 export async function generateMetadata({
   searchParams,
 }: PublicPackagesPageProps): Promise<Metadata> {
-  const resolved = (await searchParams) ?? {};
-  const category = resolved.category;
+  const [resolved, brand] = await Promise.all([
+    searchParams ?? Promise.resolve({} as { category?: ServiceCategory }),
+    getLiveBrandInfo(),
+  ]);
+  const category = resolved?.category;
 
   if (category === 'HAJJ_UMRAH') {
     return buildPageMetadata({
       title: 'Hajj & Umrah Packages',
-      description:
-        'Explore VIP & economy Hajj and Umrah packages with hotel distance details, guided Ziyarat, airfare, and transparent pricing.',
+      description: `Explore VIP & economy Hajj and Umrah packages with hotel distance details, guided Ziyarat, airfare, and transparent pricing from ${brand.agencyName} (${brand.cityLabel}).`,
       path: '/packages?category=HAJJ_UMRAH',
       ogImage: '/images/packages-hero-bg.jpg',
+      siteName: brand.agencyName,
       keywords: [
         'Hajj Packages Bangladesh',
-        'Umrah Packages Feni',
+        `Umrah Packages ${brand.cityLabel}`,
         'VIP Umrah Package',
-        'Daily Fly Hajj & Umrah',
+        brand.agencyName,
       ],
     });
   }
@@ -52,25 +56,25 @@ export async function generateMetadata({
   if (category === 'TOUR') {
     return buildPageMetadata({
       title: 'Holiday & Group Tour Packages',
-      description:
-        'Curated domestic and international holiday tour packages from Bangladesh with transparent hotel, transfer, and flight inclusions.',
+      description: `Curated domestic and international holiday tour packages from Bangladesh with transparent hotel, transfer, and flight inclusions by ${brand.agencyName}.`,
       path: '/packages?category=TOUR',
       ogImage: '/images/packages-hero-bg.jpg',
+      siteName: brand.agencyName,
       keywords: [
         'Holiday Tour Packages Bangladesh',
-        'Coxs Bazar Tour Package',
+        "Cox's Bazar Tour Package",
         'Dubai Tour Package Bangladesh',
-        'Daily Fly Holiday Tours',
+        brand.agencyName,
       ],
     });
   }
 
   return buildPageMetadata({
     title: 'Tour & Hajj Packages',
-    description:
-      'Browse curated domestic & international holiday tours, transparent inclusions, and VIP & economy Hajj & Umrah packages from Daily Fly Travel & Tours.',
+    description: `Browse curated domestic & international holiday tours, transparent inclusions, and VIP & economy Hajj & Umrah packages from ${brand.agencyName}.`,
     path: '/packages',
     ogImage: '/images/packages-hero-bg.jpg',
+    siteName: brand.agencyName,
   });
 }
 

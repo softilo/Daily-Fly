@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Check, CheckCircle2, Copy, Search } from 'lucide-react';
+import { Check, CheckCircle2, Copy, Mail, MapPin, Phone, Search } from 'lucide-react';
 import { AgencyServiceStatus, VisaCategory } from '@/types/api';
 import { submitPublicVisaInquiryAction } from '@/services/visa/visa.service';
+import { useBrand } from '@/components/providers/BrandProvider';
 
 interface VisaInquiryFormProps {
   countryId: string;
@@ -23,6 +24,8 @@ export default function VisaInquiryForm({
   category,
   serviceStatus,
 }: VisaInquiryFormProps) {
+  const brand = useBrand();
+  const cleanPhone = brand.phone.replace(/\s+/g, '');
   const isAccepting =
     serviceStatus === 'ACCEPTING_INQUIRIES' || serviceStatus === 'LIMITED';
 
@@ -251,6 +254,29 @@ export default function VisaInquiryForm({
       >
         {loading ? 'Submitting Inquiry...' : 'Submit Consultation Request'}
       </button>
+
+      <div className="space-y-1.5 border-t border-gray-100 pt-3 text-xs text-gray-500">
+        <div className="flex flex-wrap items-center gap-3">
+          <a
+            href={`tel:${cleanPhone}`}
+            className="inline-flex items-center gap-1.5 font-semibold text-[#0A3A23] hover:text-[#D9822B]"
+          >
+            <Phone className="h-3.5 w-3.5 text-[#D9822B]" />
+            {brand.phone}
+          </a>
+          <a
+            href={`mailto:${brand.email}`}
+            className="inline-flex items-center gap-1.5 truncate font-semibold text-[#0A3A23] hover:text-[#D9822B]"
+          >
+            <Mail className="h-3.5 w-3.5 shrink-0 text-[#D9822B]" />
+            <span className="truncate">{brand.email}</span>
+          </a>
+        </div>
+        <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-gray-500">
+          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#D9822B]" />
+          <span>{brand.address}</span>
+        </p>
+      </div>
     </form>
   );
 }

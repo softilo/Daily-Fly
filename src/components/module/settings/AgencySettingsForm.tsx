@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateAgencySettings } from '@/services/settings/settings.service';
+import { brandConfig } from '@/config/brand.config';
 import { AgencySettings } from '@/types/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,7 +71,7 @@ export function AgencySettingsForm({
               <Label>Agency Display Name</Label>
               <Input
                 name="agencyName"
-                defaultValue={settings?.agencyName || 'TravelPilot Agency'}
+                defaultValue={settings?.agencyName || brandConfig.agencyName}
                 required
               />
             </div>
@@ -79,7 +80,7 @@ export function AgencySettingsForm({
               <Input
                 name="legalName"
                 defaultValue={
-                  settings?.legalName || 'TravelPilot Tours & Travels Ltd.'
+                  settings?.legalName || brandConfig.legalName
                 }
               />
             </div>

@@ -15,6 +15,7 @@ import {
   getPublicCountriesAction,
   getPublicVisaServicesAction,
 } from '@/services/visa/visa.service';
+import { getLiveBrandInfo } from '@/services/settings/settings.service';
 import { JsonLd } from '@/components/shared/JsonLd';
 import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
 import {
@@ -47,31 +48,32 @@ export async function generateMetadata({
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }): Promise<Metadata> {
-  const params = await searchParams;
+  const [params, brand] = await Promise.all([searchParams, getLiveBrandInfo()]);
   const category = params.category || '';
   const categoryLabel = VISA_CATEGORY_LABELS[category];
 
   if (categoryLabel) {
     return buildPageMetadata({
       title: `${categoryLabel} Requirements & Assistance`,
-      description: `Check verified ${categoryLabel.toLowerCase()} checklists, destination countries, embassy timelines, and consultancy support from Daily Fly Travel & Tours.`,
+      description: `Check verified ${categoryLabel.toLowerCase()} checklists, destination countries, embassy timelines, and consultancy support from ${brand.agencyName}.`,
       path: `/visa-services?category=${category}`,
       ogImage: '/images/visa-hero-bg.jpg',
+      siteName: brand.agencyName,
       keywords: [
         `${categoryLabel} Bangladesh`,
         `${categoryLabel} Checklist`,
         'Visa Assistance Bangladesh',
-        'Daily Fly Travel & Tours',
+        brand.agencyName,
       ],
     });
   }
 
   return buildPageMetadata({
     title: 'Destination Countries & Visa Services',
-    description:
-      'Verified work permit checklists, student visa requirements, tourist visa guidance, and destination country coverage from Daily Fly Travel & Tours.',
+    description: `Verified work permit checklists, student visa requirements, tourist visa guidance, and destination country coverage from ${brand.agencyName}.`,
     path: '/visa-services',
     ogImage: '/images/visa-hero-bg.jpg',
+    siteName: brand.agencyName,
   });
 }
 

@@ -239,9 +239,18 @@ export default async function PublicPackageDetailsPage({
                 </a>
               </div>
 
-              <div className="space-y-1 border-t border-gray-100 pt-3 text-xs text-gray-500">
+              <div className="space-y-1.5 border-t border-gray-100 pt-3 text-xs text-gray-500">
                 <p>Hours: {brand.officeHours}</p>
-                <p>Email: {brand.email}</p>
+                <p>
+                  Email:{' '}
+                  <a
+                    href={`mailto:${brand.email}`}
+                    className="font-semibold text-[#0A3A23] hover:text-[#D9822B] hover:underline"
+                  >
+                    {brand.email}
+                  </a>
+                </p>
+                <p>Office: {brand.address}</p>
               </div>
             </Card>
           </div>

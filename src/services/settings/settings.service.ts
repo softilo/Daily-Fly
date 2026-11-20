@@ -2,6 +2,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import { cache } from 'react';
 import { revalidatePath } from 'next/cache';
 import { serverFetch } from '@/lib/serverFetch';
 import {
@@ -11,11 +12,9 @@ import {
 } from '@/lib/brand';
 import { AgencySettings } from '@/types/api';
 
-const SETTINGS_CACHE_PATH = path.join(
-  process.cwd(),
-  '.next',
-  'agency-settings-cache.json',
-);
+const SETTINGS_CACHE_PATH = process.env.VERCEL
+  ? path.join('/tmp', 'dailyfly-agency-settings-cache.json')
+  : path.join(process.cwd(), '.next', 'agency-settings-cache.json');
 
 async function writeSettingsCache(settings: AgencySettings): Promise<void> {
   try {
@@ -47,6 +46,26 @@ function unwrapSettings(raw: unknown): AgencySettings | null {
   return inner as AgencySettings;
 }
 
+function mergeSettings(
+  fallback: AgencySettings | null,
+  fresh: AgencySettings | null,
+): AgencySettings | null {
+  if (!fallback && !fresh) return null;
+  const merged = { ...(fallback ?? {}), ...(fresh ?? {}) } as Record<
+    string,
+    unknown
+  >;
+  // Never let empty strings in partial payloads clobber populated cached values
+  if (fresh && fallback) {
+    for (const [k, v] of Object.entries(fresh)) {
+      if (v === '' || v === null || v === undefined) {
+        merged[k] = (fallback as unknown as Record<string, unknown>)[k];
+      }
+    }
+  }
+  return merged as unknown as AgencySettings;
+}
+
 export async function getAgencySettings(): Promise<AgencySettings | null> {
   const res = await serverFetch.get('/settings/agency');
   if (!res.ok) return readSettingsCache();
@@ -58,38 +77,56 @@ export async function getAgencySettings(): Promise<AgencySettings | null> {
   return parsed;
 }
 
-export async function getLiveBrandInfo(): Promise<LiveBrandInfo> {
+const getLiveBrandInfoCached = cache(async (): Promise<LiveBrandInfo> => {
+  const cached = await readSettingsCache();
+
   try {
+    // 1. Prefer public unauthenticated endpoint so guests never trigger private auth retries
+    const publicRes = await serverFetch.get('/settings/public');
+    let parsed: AgencySettings | null = null;
+    if (publicRes.ok) {
+      const body = await publicRes.json().catch(() => null);
+      parsed = unwrapSettings(body);
+    }
+
+    const hasCompleteContact = Boolean(
+      parsed?.phone?.trim() && parsed?.email?.trim() && parsed?.address?.trim(),
+    );
+
+    if (parsed && hasCompleteContact) {
+      const merged = mergeSettings(cached, parsed);
+      if (merged) {
+        await writeSettingsCache(merged);
+        return buildLiveBrandInfo(merged);
+      }
+    }
+
+    // 2. Try authenticated agency settings endpoint if public endpoint failed or omitted contact fields
     const res = await serverFetch.get('/settings/agency');
     if (res.ok) {
       const body = await res.json().catch(() => null);
-      const parsed = unwrapSettings(body);
-      if (parsed) {
-        await writeSettingsCache(parsed);
-        return buildLiveBrandInfo(parsed);
+      const adminParsed = unwrapSettings(body);
+      const merged = mergeSettings(mergeSettings(cached, parsed), adminParsed);
+      if (merged) {
+        await writeSettingsCache(merged);
+        return buildLiveBrandInfo(merged);
       }
     }
 
-    const publicRes = await serverFetch.get('/settings/public');
-    if (publicRes.ok) {
-      const body = await publicRes.json().catch(() => null);
-      const parsed = unwrapSettings(body);
-      if (parsed) {
-        await writeSettingsCache(parsed);
-        return buildLiveBrandInfo(parsed);
-      }
-    }
-
-    const cached = await readSettingsCache();
-    if (cached) {
-      return buildLiveBrandInfo(cached);
+    const fallbackMerged = mergeSettings(cached, parsed);
+    if (fallbackMerged) {
+      await writeSettingsCache(fallbackMerged);
+      return buildLiveBrandInfo(fallbackMerged);
     }
 
     return DEFAULT_LIVE_BRAND;
   } catch {
-    const cached = await readSettingsCache();
     return cached ? buildLiveBrandInfo(cached) : DEFAULT_LIVE_BRAND;
   }
+});
+
+export async function getLiveBrandInfo(): Promise<LiveBrandInfo> {
+  return getLiveBrandInfoCached();
 }
 
 export async function updateAgencySettings(
@@ -120,17 +157,27 @@ export async function updateAgencySettings(
   }
 
   const saved = unwrapSettings(body);
-  if (saved) {
-    await writeSettingsCache(saved);
+  const existingCache = await readSettingsCache();
+  const merged = mergeSettings(
+    existingCache,
+    saved ?? ({ ...payload } as AgencySettings),
+  );
+  if (merged) {
+    await writeSettingsCache(merged);
   }
 
   revalidatePath('/', 'layout');
+  revalidatePath('/packages');
+  revalidatePath('/visa-services');
+  revalidatePath('/contact');
+  revalidatePath('/track-status');
   revalidatePath('/dashboard', 'layout');
   revalidatePath('/dashboard/settings');
+  revalidatePath('/sitemap.xml');
 
   return {
     success: true,
     message: 'Agency settings saved & applied across website',
-    data: saved ?? (body as AgencySettings),
+    data: merged ?? (body as AgencySettings),
   };
 }

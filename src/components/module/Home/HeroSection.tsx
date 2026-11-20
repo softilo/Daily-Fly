@@ -100,7 +100,9 @@ export function HeroSection() {
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#0A3A23]/15 bg-white px-3.5 py-1.5 text-xs font-semibold text-[#0A3A23] shadow-sm sm:text-sm">
               <span className="flex h-2 w-2 rounded-full bg-[#D9822B] animate-ping" />
               <span className="flex h-2 w-2 rounded-full bg-[#0A3A23]" />
-              <span>Certified &amp; Trusted Travel Agency in Feni</span>
+              <span>
+                Certified &amp; Trusted Travel Agency in {brand.cityLabel}
+              </span>
             </div>
 
             <h1 className="mb-6 font-serif text-3xl font-extrabold leading-[1.18] tracking-tight text-[#0A3A23] sm:text-5xl sm:leading-[1.14] lg:text-6xl">
@@ -128,7 +130,7 @@ export function HeroSection() {
               <strong className="font-semibold text-gray-900">Air Ticket Booking</strong>,{' '}
               <strong className="font-semibold text-gray-900">Visa Assistance</strong>,{' '}
               <strong className="font-semibold text-[#0A3A23]">Europe Work Permits</strong>, and sacred{' '}
-              <strong className="font-semibold text-[#D9822B]">Hajj &amp; Umrah</strong> packages. Located at Feni Center, Feni.
+              <strong className="font-semibold text-[#D9822B]">Hajj &amp; Umrah</strong> packages. Located at {brand.address}.
             </p>
 
             <div className="mb-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
@@ -175,7 +177,7 @@ export function HeroSection() {
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 shrink-0 text-[#0A3A23]" />
                 <span className="text-xs font-semibold text-gray-700 sm:text-sm">
-                  Feni Center Office
+                  {brand.shortLocation} Office
                 </span>
               </div>
             </div>

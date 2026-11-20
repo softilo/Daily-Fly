@@ -9,6 +9,8 @@ export interface LiveBrandInfo {
   phone: string;
   whatsapp: string;
   address: string;
+  shortLocation: string;
+  cityLabel: string;
   officeHours: string;
   website?: string;
   logoUrl?: string;
@@ -22,6 +24,60 @@ export interface LiveBrandInfo {
 }
 
 const IGNORED_INITIAL_WORDS = new Set(['the', 'and', 'of', 'for', '&', 'a', 'an']);
+
+function normalizeWhatsappNumber(phone: string): string {
+  const trimmed = phone.trim();
+  const digits = trimmed.replace(/[^0-9]/g, '');
+  if (digits.length < 7) {
+    return brandConfig.contact.whatsapp;
+  }
+
+  if (trimmed.startsWith('+')) {
+    return `+${digits}`;
+  }
+  if (digits.startsWith('880')) {
+    return `+${digits}`;
+  }
+  if (digits.startsWith('0')) {
+    return `+88${digits}`;
+  }
+  return `+${digits}`;
+}
+
+export function extractLocationSummary(address: string): {
+  shortLocation: string;
+  cityLabel: string;
+} {
+  const parts = address
+    .split(',')
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0 && !/^\d{3,6}$/.test(p));
+
+  const nonCountryParts = parts.filter(
+    (p) => p.toLowerCase() !== 'bangladesh',
+  );
+
+  const cityCandidate =
+    nonCountryParts[nonCountryParts.length - 1] ||
+    parts[0] ||
+    'Bangladesh';
+  const cleanedCity = cityCandidate.replace(/-\d{3,6}$/, '').trim() || 'Bangladesh';
+
+  if (nonCountryParts.length >= 2) {
+    const first = nonCountryParts[0];
+    const last = cleanedCity;
+    const shortLocation =
+      first.toLowerCase() === last.toLowerCase()
+        ? first
+        : `${first}, ${last}`;
+    return { shortLocation, cityLabel: cleanedCity };
+  }
+
+  return {
+    shortLocation: nonCountryParts[0] || address,
+    cityLabel: cleanedCity,
+  };
+}
 
 function deriveLogoParts(agencyName: string): {
   logoPrimary: string;
@@ -99,12 +155,9 @@ export function buildLiveBrandInfo(
     brandConfig.legalName;
   const email = settings?.email?.trim() || brandConfig.contact.email;
   const phone = settings?.phone?.trim() || brandConfig.contact.phone;
-  const whatsappDigits = phone.replace(/[^0-9]/g, '');
-  const whatsapp =
-    whatsappDigits.length >= 7
-      ? `+${whatsappDigits.startsWith('88') ? whatsappDigits : `88${whatsappDigits}`}`
-      : brandConfig.contact.whatsapp;
+  const whatsapp = normalizeWhatsappNumber(phone);
   const address = settings?.address?.trim() || brandConfig.contact.address;
+  const { shortLocation, cityLabel } = extractLocationSummary(address);
   const defaultCurrency =
     settings?.defaultCurrency?.trim() || brandConfig.defaults.currency;
 
@@ -119,6 +172,8 @@ export function buildLiveBrandInfo(
     phone,
     whatsapp,
     address,
+    shortLocation,
+    cityLabel,
     officeHours: brandConfig.contact.officeHours,
     website: settings?.website || undefined,
     logoUrl: settings?.logoUrl || brandConfig.logo.imageUrl,
