@@ -11,6 +11,7 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
   showTagline?: boolean;
   className?: string;
+  variant?: 'default' | 'sidebar';
 }
 
 export function Logo({
@@ -19,6 +20,7 @@ export function Logo({
   size = 'md',
   showTagline = false,
   className,
+  variant = 'default',
 }: LogoProps) {
   const brand = useBrand();
   const logoSrc = brand.logoUrl || '/logo.png';
@@ -36,22 +38,41 @@ export function Logo({
     lg: 'text-2xl sm:text-3xl',
   }[size];
 
-  return (
-    <Link href="/" className="flex items-center gap-3 group">
+  const isDarkSurface = inverted || variant === 'sidebar';
 
+  return (
+    <Link
+      href={href}
+      className={cn('flex items-center gap-3 group', className)}
+    >
       <div className="flex flex-col">
         <div className="flex items-baseline gap-1">
-          <span className="font-extrabold text-xl sm:text-2xl text-[#0A3A23] tracking-tight font-serif">
+          <span
+            className={cn(
+              'font-extrabold text-xl sm:text-2xl tracking-tight font-serif',
+              isDarkSurface ? 'text-white' : 'text-[#0A3A23]',
+            )}
+          >
             Daily
           </span>
           <span className="font-extrabold text-xl sm:text-2xl text-[#D9822B] tracking-tight font-serif">
             Fly
           </span>
         </div>
-        <span className="text-[10px] sm:text-[11px] font-bold text-[#0A3A23]/80 tracking-wider uppercase -mt-1">
+        <span
+          className={cn(
+            'text-[10px] sm:text-[11px] font-bold tracking-wider uppercase -mt-1',
+            isDarkSurface ? 'text-slate-200/90' : 'text-[#0A3A23]/80',
+          )}
+        >
           Travel &amp; Tours
         </span>
-        <span className="text-[9px] text-[#D9822B] font-medium italic hidden sm:block">
+        <span
+          className={cn(
+            'text-[9px] font-medium italic hidden sm:block',
+            isDarkSurface ? 'text-[#F7D29E]' : 'text-[#D9822B]',
+          )}
+        >
           Explore the world with us
         </span>
       </div>

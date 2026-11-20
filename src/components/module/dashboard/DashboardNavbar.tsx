@@ -116,8 +116,8 @@ export function DashboardNavbar({ user }: { user: StaffUser }) {
             onClick={() => setMobileOpen(false)}
           />
           <div className="relative z-10 flex w-72 max-w-[85vw] flex-col bg-[#062416] text-slate-200 shadow-xl">
-            <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
-              <Logo href="/dashboard" inverted size="sm" />
+            <div className="flex min-h-16 items-center justify-between border-b border-white/10 px-4 py-2.5">
+              <Logo href="/dashboard" variant="sidebar" size="sm" />
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}

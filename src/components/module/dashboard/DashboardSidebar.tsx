@@ -64,8 +64,8 @@ export function DashboardSidebar({ role }: { role: StaffRole }) {
 
   return (
     <aside className="z-20 hidden bg-[#062416] text-slate-300 md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
-      <div className="flex h-16 items-center justify-between gap-2 border-b border-white/10 px-4">
-        <Logo href="/dashboard" inverted size="sm" />
+      <div className="flex min-h-16 items-center justify-between gap-2 border-b border-white/10 px-4 py-2.5">
+        <Logo href="/dashboard" variant="sidebar" size="sm" />
       </div>
 
       <div className="px-3.5 pt-4 pb-2">
