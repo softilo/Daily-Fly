@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans, Playfair_Display, Geist_Mono } from 'next/font/google';
 import { brandConfig } from '@/config/brand.config';
 import './globals.css';
 
@@ -7,6 +7,13 @@ const jakarta = Plus_Jakarta_Sans({
   variable: '--font-jakarta',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  variable: '--font-playfair',
+  subsets: ['latin'],
+  weight: ['700', '800', '900'],
   display: 'swap',
 });
 
@@ -50,7 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
+      className={`${jakarta.variable} ${playfair.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#F9FAFB] text-[#1F2937] font-sans">
         {children}

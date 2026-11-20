@@ -43,20 +43,20 @@ export function Navbar() {
             : 'border-b border-gray-100 bg-white py-2.5',
         )}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="inline-flex items-center justify-center rounded-xl border border-gray-200 p-2 text-[#0A3A23] hover:bg-[#edf7f1] md:hidden"
+              className="inline-flex shrink-0 items-center justify-center rounded-xl border border-gray-200 p-2 text-[#0A3A23] hover:bg-[#edf7f1] lg:hidden"
               aria-label="Open menu"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <Logo href="/" size="md" showTagline />
+            <Logo href="/" size="md" />
           </div>
 
-          <nav className="hidden items-center gap-1 md:flex lg:gap-2">
+          <nav className="hidden items-center gap-0.5 lg:flex xl:gap-1.5">
             {NAV_LINKS.map((item) => {
               const active = isRouteActive(item.href, item.exact);
               return (
@@ -64,7 +64,7 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'rounded-xl px-3 py-2 text-sm font-medium transition-colors',
+                    'whitespace-nowrap rounded-xl px-2.5 py-2 text-[13px] font-medium transition-colors xl:px-3 xl:text-sm',
                     active
                       ? 'bg-[#edf7f1] font-bold text-[#0A3A23]'
                       : 'text-gray-700 hover:bg-gray-100 hover:text-[#0A3A23]',
@@ -77,7 +77,7 @@ export function Navbar() {
             <Link
               href="/track-status"
               className={cn(
-                'ml-1 inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors',
+                'ml-1 inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-bold transition-colors xl:px-3.5',
                 pathname.startsWith('/track-status')
                   ? 'border-[#0A3A23] bg-[#0A3A23] text-white shadow-xs'
                   : 'border-[#0A3A23]/20 bg-[#edf7f1] text-[#0A3A23] hover:bg-[#0A3A23] hover:text-white',
@@ -88,26 +88,27 @@ export function Navbar() {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Link
               href="/track-status"
-              className="inline-flex items-center gap-1 rounded-full border border-[#0A3A23]/20 bg-[#edf7f1] px-3 py-1.5 text-xs font-bold text-[#0A3A23] md:hidden"
+              className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-[#0A3A23]/20 bg-[#edf7f1] px-2.5 py-1.5 text-xs font-bold text-[#0A3A23] lg:hidden"
             >
               <Search className="h-3.5 w-3.5" />
-              Track
+              <span>Track</span>
             </Link>
-            <Link href="/contact">
-              <Button variant="gold" size="sm">
-                Apply / Get Quote
+            <Link href="/contact" className="shrink-0">
+              <Button variant="gold" size="sm" className="px-3 sm:px-3.5">
+                <span className="sm:hidden">Quote</span>
+                <span className="hidden sm:inline">Apply / Get Quote</span>
               </Button>
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile & Tablet Menu Drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden">
+        <div className="fixed inset-0 z-50 flex lg:hidden">
           <div
             className="fixed inset-0 bg-[#062416]/55 backdrop-blur-xs"
             onClick={() => setMobileOpen(false)}
@@ -164,6 +165,13 @@ export function Navbar() {
                 <Phone className="h-3.5 w-3.5 fill-white" />
                 Call {brand.phone}
               </a>
+              <Link
+                href="/contact"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center rounded-xl border border-[#0A3A23] bg-white px-3 py-2 font-bold text-[#0A3A23] hover:bg-[#edf7f1]"
+              >
+                Apply / Get Quote
+              </Link>
             </div>
           </div>
         </div>
