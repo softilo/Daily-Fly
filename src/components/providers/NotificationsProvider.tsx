@@ -90,15 +90,42 @@ export function NotificationsProvider({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [data, setData] = useState<DashboardNotificationsPayload>(initialData);
+  const [dataState, setDataState] = useState<{
+    seedKey: string;
+    payload: DashboardNotificationsPayload;
+  }>({
+    seedKey: initialData.generatedAt,
+    payload: initialData,
+  });
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const initialPathnameRef = useRef(pathname);
-  const markedLeadRef = useRef<Set<string>>(new Set());
+  const markedVisitRef = useRef<Set<string>>(new Set());
 
-  useEffect(() => {
-    setData(initialData);
-  }, [initialData]);
+  const data =
+    dataState.seedKey === initialData.generatedAt
+      ? dataState.payload
+      : initialData;
+
+  const updateData = useCallback(
+    (
+      updater:
+        | DashboardNotificationsPayload
+        | ((prev: DashboardNotificationsPayload) => DashboardNotificationsPayload),
+    ) => {
+      setDataState((prev) => {
+        const current =
+          prev.seedKey === initialData.generatedAt ? prev.payload : initialData;
+        const nextPayload =
+          typeof updater === 'function' ? updater(current) : updater;
+        return {
+          seedKey: initialData.generatedAt,
+          payload: nextPayload,
+        };
+      });
+    },
+    [initialData],
+  );
 
   const refreshNotifications = useCallback(async () => {
     setIsRefreshing(true);
@@ -111,14 +138,14 @@ export function NotificationsProvider({
       if (!res.ok) return;
       const fresh = (await res.json()) as DashboardNotificationsPayload;
       if (fresh && Array.isArray(fresh.items)) {
-        setData(fresh);
+        updateData(fresh);
       }
     } catch {
       // Non-fatal network error; retain current state until next poll
     } finally {
       setIsRefreshing(false);
     }
-  }, []);
+  }, [updateData]);
 
   const patchNotifications = useCallback(
     async (payload: Record<string, unknown>) => {
@@ -133,7 +160,7 @@ export function NotificationsProvider({
         if (!res.ok) return;
         const fresh = (await res.json()) as DashboardNotificationsPayload;
         if (fresh && Array.isArray(fresh.items)) {
-          setData(fresh);
+          updateData(fresh);
         }
       } catch {
         // Ignore transient mutation failure
@@ -141,12 +168,12 @@ export function NotificationsProvider({
         setIsUpdating(false);
       }
     },
-    [],
+    [updateData],
   );
 
   const markNotificationRead = useCallback(
     async (id: string) => {
-      setData((prev) => {
+      updateData((prev) => {
         const target = prev.items.find((i) => i.id === id);
         if (!target || target.read) return prev;
         return recomputeCounts(
@@ -158,15 +185,16 @@ export function NotificationsProvider({
       });
       await patchNotifications({ action: 'mark_read', notificationIds: [id] });
     },
-    [patchNotifications],
+    [patchNotifications, updateData],
   );
 
   const markLeadRead = useCallback(
     async (leadId: string) => {
-      if (!leadId || markedLeadRef.current.has(leadId)) return;
-      markedLeadRef.current.add(leadId);
+      const visitKey = `${leadId}:${initialData.generatedAt}`;
+      if (!leadId || markedVisitRef.current.has(visitKey)) return;
+      markedVisitRef.current.add(visitKey);
 
-      setData((prev) => {
+      updateData((prev) => {
         const hasUnread = prev.items.some(
           (i) => !i.read && i.leadId === leadId,
         );
@@ -180,11 +208,11 @@ export function NotificationsProvider({
       });
       await patchNotifications({ action: 'mark_lead_read', leadId });
     },
-    [patchNotifications],
+    [initialData.generatedAt, patchNotifications, updateData],
   );
 
   const markWebInquiriesRead = useCallback(async () => {
-    setData((prev) =>
+    updateData((prev) =>
       recomputeCounts(
         prev,
         prev.items.map((item) =>
@@ -193,17 +221,17 @@ export function NotificationsProvider({
       ),
     );
     await patchNotifications({ action: 'mark_web_inquiries_read' });
-  }, [patchNotifications]);
+  }, [patchNotifications, updateData]);
 
   const markAllRead = useCallback(async () => {
-    setData((prev) =>
+    updateData((prev) =>
       recomputeCounts(
         prev,
         prev.items.map((item) => ({ ...item, read: true })),
       ),
     );
     await patchNotifications({ action: 'mark_all_read' });
-  }, [patchNotifications]);
+  }, [patchNotifications, updateData]);
 
   // Refresh after navigating to another dashboard screen
   useEffect(() => {
