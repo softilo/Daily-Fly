@@ -25,6 +25,10 @@ import {
   ServiceCategory,
 } from '@/types/api';
 import { formatDate } from '@/lib/utils';
+import {
+  TrackStatusPageSkeleton,
+  TrackStatusResultSkeleton,
+} from '@/components/shared/AppSkeletons';
 
 function TrackStatusContent() {
   const brand = useBrand();
@@ -33,6 +37,7 @@ function TrackStatusContent() {
 
   const [code, setCode] = useState(initialCode);
   const [isPending, startTransition] = useTransition();
+  const [isFetchingInitial, setIsFetchingInitial] = useState(Boolean(initialCode));
   const [copiedLink, setCopiedLink] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [trackedFile, setTrackedFile] = useState<{
@@ -66,19 +71,26 @@ function TrackStatusContent() {
   };
 
   useEffect(() => {
-    if (initialCode) {
-      void trackPublicFileStatus(initialCode.trim()).then((res) => {
-        if (!res.success || !res.data) {
-          setTrackedFile(null);
-          setError(
-            res.message ||
-              'No file found with that Tracking Code. Try demo code: WP-102938',
-          );
-          return;
-        }
-        setTrackedFile(res.data);
-      });
-    }
+    if (!initialCode) return;
+
+    let active = true;
+    void trackPublicFileStatus(initialCode.trim()).then((res) => {
+      if (!active) return;
+      setIsFetchingInitial(false);
+      if (!res.success || !res.data) {
+        setTrackedFile(null);
+        setError(
+          res.message ||
+            'No file found with that Tracking Code. Try demo code: WP-102938',
+        );
+        return;
+      }
+      setTrackedFile(res.data);
+    });
+
+    return () => {
+      active = false;
+    };
   }, [initialCode]);
 
   const sectorMeta = trackedFile
@@ -183,7 +195,9 @@ function TrackStatusContent() {
           )}
         </Card>
 
-        {trackedFile && sectorMeta && (
+        {(isPending || isFetchingInitial) && <TrackStatusResultSkeleton />}
+
+        {!(isPending || isFetchingInitial) && trackedFile && sectorMeta && (
           <div className="space-y-6">
             {/* File Header & Progress */}
             <Card className="space-y-5 border-[#0A3A23]/20 bg-gradient-to-br from-[#F0F7F3] via-white to-[#F9FAFB] p-6">
@@ -406,13 +420,7 @@ function TrackStatusContent() {
 
 export default function PublicTrackStatusPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="mx-auto max-w-4xl px-4 py-12 text-center text-sm text-gray-500">
-          Loading file status tracker...
-        </div>
-      }
-    >
+    <Suspense fallback={<TrackStatusPageSkeleton />}>
       <TrackStatusContent />
     </Suspense>
   );

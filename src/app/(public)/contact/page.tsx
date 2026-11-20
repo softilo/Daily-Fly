@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ServiceCategory } from '@/types/api';
 import { submitPublicInquiry } from '@/services/leads/leads.service';
+import { ContactPageSkeleton } from '@/components/shared/AppSkeletons';
 
 function ContactFormContent() {
   const searchParams = useSearchParams();
@@ -501,13 +502,7 @@ function ContactFormContent() {
 
 export default function PublicContactAndAssessmentPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="mx-auto max-w-5xl px-4 py-12 text-center text-sm text-gray-500">
-          Loading contact and assessment form...
-        </div>
-      }
-    >
+    <Suspense fallback={<ContactPageSkeleton />}>
       <ContactFormContent />
     </Suspense>
   );
