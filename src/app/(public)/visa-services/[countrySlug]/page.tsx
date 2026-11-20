@@ -88,9 +88,9 @@ export default async function CountryVisaDetailPage({
               {services.map((service: VisaService) => (
                 <div
                   key={service.id}
-                  className="flex flex-col justify-between rounded-2xl border border-gray-200/80 bg-white p-6 shadow-xs transition hover:border-[#0A3A23] hover:shadow-md"
+                  className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#0A3A23]/50 hover:shadow-xl"
                 >
-                  <div>
+                  <div className="p-6">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <VisaCategoryBadge
                         category={service.category}
@@ -99,21 +99,23 @@ export default async function CountryVisaDetailPage({
                       <AgencyServiceStatusBadge status={service.serviceStatus} />
                     </div>
 
-                    <h3 className="mt-3 text-xl font-bold text-[#0A3A23]">
+                    <h3 className="mt-3.5 text-xl font-extrabold text-[#0A3A23] transition-colors group-hover:text-[#D9822B]">
                       {service.title}
                     </h3>
-                    <p className="mt-2 text-sm text-gray-600">{service.shortDescription}</p>
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">
+                      {service.shortDescription}
+                    </p>
 
                     <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl border border-gray-100 bg-[#F9FAFB] p-3.5 text-xs">
                       <div>
-                        <span className="text-gray-500">Estimated Processing:</span>
-                        <p className="mt-0.5 font-bold text-gray-800">
+                        <span className="text-[11px] text-gray-500">Estimated Processing</span>
+                        <p className="mt-0.5 font-bold text-gray-900">
                           {service.estimatedProcessingTime || 'Subject to Embassy'}
                         </p>
                       </div>
                       <div>
-                        <span className="text-gray-500">Agency Consultancy Fee:</span>
-                        <p className="mt-0.5 font-bold text-[#0A3A23] tabular-nums">
+                        <span className="text-[11px] text-gray-500">Agency Consultancy Fee</span>
+                        <p className="mt-0.5 font-extrabold text-[#0A3A23] tabular-nums">
                           {service.agencyServiceFee
                             ? `${service.currency} ${Number(service.agencyServiceFee).toLocaleString()}`
                             : 'Upon Consultation'}
@@ -122,15 +124,15 @@ export default async function CountryVisaDetailPage({
                     </div>
                   </div>
 
-                  <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
-                    <span className="text-xs font-medium text-gray-500">
-                      {service.requirements?.length || 0} Required Documents Listed
+                  <div className="flex items-center justify-between border-t border-gray-100 bg-[#F9FAFB]/80 px-6 py-4">
+                    <span className="text-xs font-semibold text-gray-600">
+                      {service.requirements?.length || 0} Required Documents
                     </span>
                     <Link
                       href={`/visa-services/${country.slug}/${service.slug}`}
-                      className="rounded-xl bg-[#D9822B] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#BF6F1E]"
+                      className="rounded-xl bg-[#D9822B] px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-[#BF6F1E]"
                     >
-                      Full Checklist &amp; Consultation →
+                      Full Checklist &amp; Apply →
                     </Link>
                   </div>
                 </div>

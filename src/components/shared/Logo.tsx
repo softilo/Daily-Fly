@@ -38,15 +38,7 @@ export function Logo({
 
   return (
     <Link href="/" className="flex items-center gap-3 group">
-      <div className="relative w-11 h-11 sm:w-12 sm:h-12 shrink-0 transition-transform duration-300 group-hover:scale-105">
-        <Image
-          src="/logo.png"
-          alt="Daily Fly Travel & Tours Logo"
-          fill
-          className="object-contain"
-          priority
-        />
-      </div>
+
       <div className="flex flex-col">
         <div className="flex items-baseline gap-1">
           <span className="font-extrabold text-xl sm:text-2xl text-[#0A3A23] tracking-tight font-serif">

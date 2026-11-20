@@ -38,16 +38,21 @@ export function FeaturesSection() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
             {HOW_IT_WORKS.map((item) => (
               <Link key={item.step} href={item.href}>
-                <Card className="group flex items-center gap-3.5 border-gray-200/90 p-5 transition hover:-translate-y-0.5 hover:border-[#0A3A23] hover:shadow-md">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0A3A23] text-sm font-extrabold text-white transition-colors group-hover:bg-[#D9822B]">
-                    {item.step}
+                <Card className="group flex items-center justify-between gap-3.5 border-gray-200/90 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#0A3A23]/50 hover:shadow-lg">
+                  <div className="flex items-center gap-3.5">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0A3A23] text-sm font-extrabold text-white shadow-xs transition-colors group-hover:bg-[#D9822B]">
+                      {item.step}
+                    </span>
+                    <h3 className="text-sm font-bold text-[#0A3A23] sm:text-base">
+                      {item.title}
+                    </h3>
+                  </div>
+                  <span className="text-sm font-bold text-[#D9822B] transition-transform group-hover:translate-x-1">
+                    →
                   </span>
-                  <h3 className="text-sm font-bold text-[#0A3A23] sm:text-base">
-                    {item.title}
-                  </h3>
                 </Card>
               </Link>
             ))}
@@ -66,15 +71,16 @@ export function FeaturesSection() {
             {publicContentConfig.features.map((feat, idx) => (
               <Card
                 key={idx}
-                className="border-gray-200/80 p-6 transition hover:border-[#0A3A23]/40 hover:shadow-md"
+                className="group relative overflow-hidden border-gray-200/90 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#0A3A23]/40 hover:shadow-lg"
               >
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl border border-[#F7D29E] bg-[#FEF3E2] text-xs font-extrabold text-[#BF6F1E]">
+                <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-[#0A3A23] to-[#D9822B] opacity-0 transition-opacity group-hover:opacity-100" />
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-[#F7D29E] bg-[#FEF3E2] text-xs font-extrabold text-[#BF6F1E] transition-colors group-hover:bg-[#D9822B] group-hover:text-white">
                   0{idx + 1}
                 </div>
                 <h3 className="text-base font-bold text-[#0A3A23]">
                   {feat.title}
                 </h3>
-                <p className="mt-1.5 text-xs leading-relaxed text-gray-600">
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">
                   {feat.description}
                 </p>
               </Card>

@@ -83,35 +83,44 @@ export default async function PublicHomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {countries.map((country: Country) => (
-                <Link
-                  key={country.id}
-                  href={`/visa-services/${country.slug}`}
-                  className="group flex items-center justify-between rounded-2xl border border-gray-200/90 bg-white p-4 shadow-xs transition hover:-translate-y-0.5 hover:border-[#0A3A23] hover:shadow-md"
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#0A3A23]/15 bg-[#edf7f1] text-xs font-bold uppercase text-[#0A3A23]">
-                      {country.isoCode || country.name.slice(0, 2)}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate font-bold text-[#0A3A23] group-hover:text-[#D9822B]">
-                        {country.name}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {country.visaServices?.length || 0} Visa Program
-                        {(country.visaServices?.length || 0) === 1 ? '' : 's'} Available
-                      </p>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {countries.map((country: Country) => {
+                const svcCount = country.visaServices?.length || 0;
+                return (
+                  <Link
+                    key={country.id}
+                    href={`/visa-services/${country.slug}`}
+                    className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200/90 bg-white p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#0A3A23]/50 hover:shadow-lg"
+                  >
+                    <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-[#0A3A23] to-[#D9822B] opacity-0 transition-opacity group-hover:opacity-100" />
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#0A3A23]/15 bg-[#edf7f1] text-xs font-extrabold uppercase text-[#0A3A23] transition-colors group-hover:bg-[#0A3A23] group-hover:text-white">
+                          {country.isoCode || country.name.slice(0, 2)}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-base font-bold text-[#0A3A23] group-hover:text-[#D9822B]">
+                            {country.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {svcCount} Visa Program{svcCount === 1 ? '' : 's'} Available
+                          </p>
+                        </div>
+                      </div>
+                      <CountryCoverageBadge status={country.coverageStatus} />
                     </div>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1.5">
-                    <CountryCoverageBadge status={country.coverageStatus} />
-                    <span className="text-[11px] font-bold text-[#0A3A23] transition group-hover:translate-x-0.5 group-hover:text-[#D9822B]">
-                      View Checklist →
-                    </span>
-                  </div>
-                </Link>
-              ))}
+
+                    <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 text-xs font-bold text-[#0A3A23]">
+                      <span className="text-gray-500 font-medium">
+                        {country.isoCode ? `ISO • ${country.isoCode}` : 'Document Guide'}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[#D9822B] transition-transform group-hover:translate-x-0.5">
+                        View Checklist →
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

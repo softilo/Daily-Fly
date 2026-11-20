@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -64,27 +65,43 @@ export default async function PublicVisaServicesPage({
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Hero Banner */}
-      <section className="relative overflow-hidden border-b border-[#062416] bg-gradient-to-br from-[#0A3A23] via-[#0d482b] to-[#062416] py-12 text-white">
-        <div className="pointer-events-none absolute top-0 right-0 h-72 w-72 rounded-full bg-[#D9822B]/15 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center rounded-full border border-[#D9822B]/40 bg-[#D9822B]/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#F7D29E]">
-              Visa &amp; Immigration Portal
-            </span>
-            <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Destination Countries &amp; Visa Services
+      {/* Compact Photographic Visa & Immigration Banner */}
+      <section className="relative overflow-hidden border-b border-[#062416] bg-[#062416] pt-8 pb-12 text-white sm:pt-10 sm:pb-14">
+        <Image
+          src="/images/visa-hero-bg.jpg"
+          alt="International airport departure lounge and aircraft at twilight"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+
+        {/* Directional Emerald Scrims for Sharp Readability while Preserving Right-Side Aircraft Scene */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#062416]/95 via-[#0A3A23]/80 to-[#062416]/35" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#062416]/80 via-transparent to-[#062416]/45" />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#F7D29E]/35 bg-[#062416]/65 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#F7D29E] backdrop-blur-md">
+              <Globe className="h-3 w-3 text-[#D9822B]" />
+              <span>Visa &amp; Immigration Portal</span>
+            </div>
+
+            <h1 className="mt-2.5 text-2xl font-extrabold leading-tight tracking-tight text-white drop-shadow-xs sm:text-4xl">
+              Destination Countries &amp;{' '}
+              <span className="text-[#F7D29E]">Visa Services</span>
             </h1>
-            <p className="mt-2 text-sm text-slate-200 sm:text-base">
+
+            <p className="mt-1.5 max-w-xl text-sm text-slate-200 sm:text-base">
               Verified work permit checklists, student visa requirements, and tourist visa consultancy.
             </p>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8">
-        {/* Category Tabs + Search Bar */}
-        <div className="space-y-4 rounded-2xl border border-gray-200/80 bg-white p-5 shadow-xs">
+      <div className="relative z-20 mx-auto -mt-5 max-w-7xl space-y-12 px-4 pb-12 sm:px-6 lg:px-8">
+        {/* Elevated Category Tabs + Search Bar */}
+        <div className="space-y-4 rounded-2xl border border-gray-200/90 bg-white p-5 shadow-lg">
           <div className="flex flex-wrap items-center gap-2 border-b border-gray-100 pb-4">
             {VISA_CATEGORY_TABS.map((tab) => {
               const isSelected = category === tab.value;
@@ -146,7 +163,7 @@ export default async function PublicVisaServicesPage({
                 No matching destination countries found.
               </p>
               <p className="mt-1 text-sm text-gray-500">
-                Try clearing your search filters or contact our Feni office directly for custom destinations.
+                Try clearing your search filters or contact our office directly for custom destinations.
               </p>
             </div>
           ) : (
@@ -155,12 +172,13 @@ export default async function PublicVisaServicesPage({
                 <Link
                   key={country.id}
                   href={`/visa-services/${country.slug}`}
-                  className="group flex flex-col justify-between rounded-2xl border border-gray-200/80 bg-white p-6 shadow-xs transition hover:-translate-y-0.5 hover:border-[#0A3A23] hover:shadow-lg"
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200/90 bg-white p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#0A3A23]/50 hover:shadow-xl"
                 >
+                  <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-[#0A3A23] to-[#D9822B] opacity-0 transition-opacity group-hover:opacity-100" />
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#0A3A23]/15 bg-[#edf7f1] text-xs font-extrabold uppercase text-[#0A3A23]">
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#0A3A23]/15 bg-[#edf7f1] text-xs font-extrabold uppercase text-[#0A3A23] transition-colors group-hover:bg-[#0A3A23] group-hover:text-white">
                           {country.isoCode || country.name.slice(0, 2)}
                         </span>
                         <div>
@@ -176,7 +194,7 @@ export default async function PublicVisaServicesPage({
                     </div>
 
                     {country.shortIntro && (
-                      <p className="mt-3 line-clamp-2 text-sm text-gray-600">
+                      <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-600">
                         {country.shortIntro}
                       </p>
                     )}
@@ -199,12 +217,12 @@ export default async function PublicVisaServicesPage({
                   </div>
 
                   <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4 text-xs font-bold text-[#0A3A23]">
-                    <span>
+                    <span className="font-semibold text-gray-500">
                       {country.visaServices?.length || 0} Published Service
                       {(country.visaServices?.length || 0) === 1 ? '' : 's'}
                     </span>
                     <span className="text-[#D9822B] transition group-hover:translate-x-1">
-                      Explore Country Services →
+                      Explore Services →
                     </span>
                   </div>
                 </Link>
@@ -228,19 +246,19 @@ export default async function PublicVisaServicesPage({
               </p>
             </div>
           ) : (
-            <div className="grid gap-5 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2">
               {services.map((service: VisaService) => (
                 <div
                   key={service.id}
-                  className="flex flex-col justify-between rounded-2xl border border-gray-200/80 bg-white p-6 shadow-xs transition hover:border-[#0A3A23]/40 hover:shadow-md"
+                  className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#0A3A23]/50 hover:shadow-xl"
                 >
-                  <div>
+                  <div className="p-6">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex h-6 items-center rounded-md border border-[#0A3A23]/15 bg-[#edf7f1] px-1.5 font-mono text-[11px] font-bold text-[#0A3A23]">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex h-6 items-center rounded-md border border-[#0A3A23]/15 bg-[#edf7f1] px-2 font-mono text-[11px] font-bold text-[#0A3A23]">
                           {service.country?.isoCode || 'GLB'}
                         </span>
-                        <span className="text-sm font-semibold text-gray-700">
+                        <span className="text-sm font-bold text-gray-800">
                           {service.country?.name}
                         </span>
                         <VisaCategoryBadge
@@ -251,21 +269,23 @@ export default async function PublicVisaServicesPage({
                       <AgencyServiceStatusBadge status={service.serviceStatus} />
                     </div>
 
-                    <h3 className="mt-3 text-lg font-bold text-[#0A3A23]">
+                    <h3 className="mt-3.5 text-lg font-extrabold text-[#0A3A23] transition-colors group-hover:text-[#D9822B]">
                       {service.title}
                     </h3>
-                    <p className="mt-1.5 text-sm text-gray-600">{service.shortDescription}</p>
+                    <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-gray-600">
+                      {service.shortDescription}
+                    </p>
 
-                    <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl border border-gray-100 bg-[#F9FAFB] p-3 text-xs">
+                    <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl border border-gray-100 bg-[#F9FAFB] p-3.5 text-xs">
                       <div>
-                        <span className="text-gray-500">Indicative Processing:</span>
-                        <p className="font-bold text-gray-800">
+                        <span className="text-[11px] text-gray-500">Indicative Processing</span>
+                        <p className="mt-0.5 font-bold text-gray-900">
                           {service.estimatedProcessingTime || 'Varies by Embassy'}
                         </p>
                       </div>
                       <div>
-                        <span className="text-gray-500">Consultancy Fee:</span>
-                        <p className="font-bold text-[#0A3A23] tabular-nums">
+                        <span className="text-[11px] text-gray-500">Consultancy Fee</span>
+                        <p className="mt-0.5 font-extrabold text-[#0A3A23] tabular-nums">
                           {service.agencyServiceFee
                             ? `${service.currency} ${Number(service.agencyServiceFee).toLocaleString()}`
                             : 'Contact for Quote'}
@@ -274,15 +294,15 @@ export default async function PublicVisaServicesPage({
                     </div>
                   </div>
 
-                  <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
-                    <span className="text-xs text-gray-500">
-                      {service.requirements?.length || 0} Document Checklist Items
+                  <div className="flex items-center justify-between border-t border-gray-100 bg-[#F9FAFB]/80 px-6 py-4">
+                    <span className="text-xs font-semibold text-gray-600">
+                      {service.requirements?.length || 0} Checklist Items
                     </span>
                     <Link
                       href={`/visa-services/${service.country?.slug}/${service.slug}`}
-                      className="rounded-xl bg-[#D9822B] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#BF6F1E]"
+                      className="rounded-xl bg-[#D9822B] px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-[#BF6F1E]"
                     >
-                      View Requirements &amp; Inquire
+                      View Checklist &amp; Apply →
                     </Link>
                   </div>
                 </div>

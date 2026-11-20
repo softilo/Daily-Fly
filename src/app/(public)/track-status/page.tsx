@@ -107,15 +107,17 @@ function TrackStatusContent() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      <section className="border-b border-[#062416] bg-gradient-to-br from-[#0A3A23] via-[#0d482b] to-[#062416] py-10 text-white">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <span className="inline-flex rounded-full border border-[#D9822B]/40 bg-[#D9822B]/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#F7D29E]">
+      <section className="relative overflow-hidden border-b border-[#062416] bg-gradient-to-br from-[#062416] via-[#0A3A23] to-[#125734] py-12 text-white">
+        <div className="pointer-events-none absolute -top-20 right-0 h-72 w-72 rounded-full bg-[#D9822B]/20 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]" />
+        <div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+          <span className="inline-flex rounded-full border border-[#D9822B]/40 bg-[#D9822B]/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#F7D29E]">
             24/7 Live File Tracker
           </span>
           <h1 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-4xl">
             Track Your Visa, Work Permit or Package Status
           </h1>
-          <p className="mt-2 text-sm text-slate-200">
+          <p className="mt-2 text-sm text-slate-200 sm:text-base">
             Enter your personal Tracking Code to check passport verification, medicals, permit approvals, and flight readiness.
           </p>
         </div>

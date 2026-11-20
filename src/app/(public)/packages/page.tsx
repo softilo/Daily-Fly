@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
@@ -53,25 +54,43 @@ export default async function PublicPackagesPage({
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Header Banner */}
-      <section className="relative overflow-hidden border-b border-[#062416] bg-gradient-to-br from-[#0A3A23] via-[#0e4b2e] to-[#062416] py-12 text-white">
-        <div className="pointer-events-none absolute top-0 right-0 h-72 w-72 rounded-full bg-[#D9822B]/15 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <span className="inline-flex items-center rounded-full border border-[#D9822B]/40 bg-[#D9822B]/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#F7D29E]">
-            Verified Packages &amp; Pilgrimage
-          </span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Tour &amp; Hajj Packages
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-200 sm:text-base">
-            Curated domestic &amp; international holidays, air ticket combos, plus VIP &amp; economy Hajj &amp; Umrah packages.
-          </p>
+      {/* Compact Photographic Packages Banner */}
+      <section className="relative overflow-hidden border-b border-[#062416] bg-[#062416] pt-8 pb-12 text-white sm:pt-10 sm:pb-14">
+        <Image
+          src="/images/packages-hero-bg.jpg"
+          alt="Scenic coastal destination and golden hour travel view"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+
+        {/* Directional Emerald Scrims for Sharp Readability while Preserving Right-Side Destination View */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#062416]/95 via-[#0A3A23]/80 to-[#062416]/35" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#062416]/80 via-transparent to-[#062416]/45" />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#F7D29E]/35 bg-[#062416]/65 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#F7D29E] backdrop-blur-md">
+              <Palmtree className="h-3 w-3 text-[#D9822B]" />
+              <span>Verified Packages &amp; Pilgrimage</span>
+            </div>
+
+            <h1 className="mt-2.5 text-2xl font-extrabold leading-tight tracking-tight text-white drop-shadow-xs sm:text-4xl">
+              Tour &amp;{' '}
+              <span className="text-[#F7D29E]">Hajj Packages</span>
+            </h1>
+
+            <p className="mt-1.5 max-w-xl text-sm text-slate-200 sm:text-base">
+              Curated domestic &amp; international holidays, transparent inclusions, plus VIP &amp; economy Hajj &amp; Umrah packages.
+            </p>
+          </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="relative z-20 mx-auto -mt-5 max-w-7xl space-y-8 px-4 pb-12 sm:px-6 lg:px-8">
         {/* Search & Filter Card */}
-        <div className="space-y-4 rounded-2xl border border-gray-200/80 bg-white p-5 shadow-xs">
+        <div className="space-y-4 rounded-2xl border border-gray-200/90 bg-white p-5 shadow-lg">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="flex-1">
               <SearchFilter
