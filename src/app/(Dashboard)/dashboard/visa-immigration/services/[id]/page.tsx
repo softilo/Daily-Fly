@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { requireStaffSession } from '@/services/auth/getMe';
 import {
   getAdminCountriesAction,
   getAdminVisaServiceByIdAction,
@@ -15,6 +16,7 @@ export default async function EditVisaServicePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireStaffSession();
   const { id } = await params;
   const [service, countriesRes] = await Promise.all([
     getAdminVisaServiceByIdAction(id),

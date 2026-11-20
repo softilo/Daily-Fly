@@ -1,118 +1,23 @@
-import { getCookies, setCookie } from '@/services/auth/tokenHandler';
-import { getDefaultCookieOptions } from '@/services/auth/cookieOptions';
+import { parseCookieString } from '@/lib/auth-cookies';
+import { buildBackendUrl, refreshBackendSession } from '@/lib/auth-refresh';
+import { getJwtSecrets, inspectJwtToken } from '@/lib/jwtHandler';
+import {
+  applyAuthTokensCookies,
+  clearAllAuthCookies,
+  getAuthTokenPairFromCookies,
+} from '@/services/auth/tokenHandler';
 
-export function parseCookieString(cookieStr: string): Record<string, string> {
-  const result: Record<string, string> = {};
-  if (!cookieStr) return result;
+export { parseCookieString };
+export const buildRequestUrl = buildBackendUrl;
 
-  cookieStr.split(';').forEach((part, index) => {
-    const [rawKey, ...rawVal] = part.trim().split('=');
-    if (rawKey) {
-      const key = rawKey.trim();
-      const val = rawVal.join('=').trim();
-      result[key] = val ? decodeURIComponent(val) : '';
-      if (index === 0) {
-        result.name = key;
-        result.value = result[key];
-      }
-    }
-  });
-  return result;
+function isAuthBootstrapEndpoint(endpoint: string): boolean {
+  const normalized = endpoint.toLowerCase();
+  return (
+    normalized.includes('/auth/login') ||
+    normalized.includes('/auth/refresh') ||
+    normalized.includes('/auth/logout')
+  );
 }
-
-const BackendURL =
-  process.env.BACKEND_URL ??
-  process.env.NEXT_PUBLIC_BACKEND_URL ??
-  'http://localhost:5000';
-
-export const buildRequestUrl = (endpoint: string): string | null => {
-  if (!BackendURL) return null;
-
-  try {
-    const normalizedBase = BackendURL.endsWith('/')
-      ? BackendURL
-      : `${BackendURL}/`;
-    let normalizedEndpoint = endpoint.startsWith('/')
-      ? endpoint.slice(1)
-      : endpoint;
-
-    if (
-      !normalizedEndpoint.startsWith('api/v1') &&
-      !normalizedEndpoint.startsWith('api/')
-    ) {
-      normalizedEndpoint = `api/v1/${normalizedEndpoint}`;
-    }
-
-    return new URL(normalizedEndpoint, normalizedBase).toString();
-  } catch {
-    return null;
-  }
-};
-
-const refreshAccessToken = async (): Promise<string | null> => {
-  const refreshToken =
-    (await getCookies('refresh_token')) || (await getCookies('refreshToken'));
-  if (!refreshToken) return null;
-
-  const requestUrl = buildRequestUrl('/api/v1/auth/refresh');
-  if (!requestUrl) return null;
-
-  const res = await fetch(requestUrl, {
-    method: 'POST',
-    headers: {
-      Cookie: `refresh_token=${refreshToken}`,
-      'x-refresh-token': refreshToken,
-    },
-    cache: 'no-store',
-  });
-
-  if (!res.ok) return null;
-
-  const body = await res.json().catch(() => null);
-  let newAccessToken: string | null = body?.accessToken || null;
-  let newRefreshToken: string | null = null;
-
-  const setCookieHeaders = res.headers.getSetCookie();
-  if (setCookieHeaders?.length) {
-    for (const cookie of setCookieHeaders) {
-      const parsed = parseCookieString(cookie);
-      if (parsed.access_token || parsed.name === 'access_token') {
-        newAccessToken = parsed.access_token || parsed.value || newAccessToken;
-      }
-      if (parsed.refresh_token || parsed.name === 'refresh_token') {
-        newRefreshToken = parsed.refresh_token || parsed.value || null;
-      }
-    }
-  }
-
-  if (!newAccessToken) return null;
-
-  try {
-    await setCookie('access_token', newAccessToken, {
-      ...getDefaultCookieOptions(),
-      maxAge: 15 * 60,
-    });
-    await setCookie('accessToken', newAccessToken, {
-      ...getDefaultCookieOptions(),
-      maxAge: 15 * 60,
-    });
-
-    if (newRefreshToken) {
-      await setCookie('refresh_token', newRefreshToken, {
-        ...getDefaultCookieOptions(),
-        maxAge: 7 * 24 * 60 * 60,
-      });
-      await setCookie('refreshToken', newRefreshToken, {
-        ...getDefaultCookieOptions(),
-        maxAge: 7 * 24 * 60 * 60,
-      });
-    }
-  } catch {
-    // Cookie mutation may fail inside Server Component render
-  }
-
-  return newAccessToken;
-};
 
 const serverFetchHelper = async (
   endpoint: string,
@@ -120,11 +25,7 @@ const serverFetchHelper = async (
   allowRetry = true,
 ): Promise<Response> => {
   const { headers, ...restOptions } = options;
-  const accessToken =
-    (await getCookies('access_token')) || (await getCookies('accessToken'));
-  const refreshToken =
-    (await getCookies('refresh_token')) || (await getCookies('refreshToken'));
-  const requestUrl = buildRequestUrl(endpoint);
+  const requestUrl = buildBackendUrl(endpoint);
 
   if (!requestUrl) {
     return new Response(
@@ -139,13 +40,84 @@ const serverFetchHelper = async (
     );
   }
 
+  let { accessToken, refreshToken } = await getAuthTokenPairFromCookies();
+  const isBootstrap = isAuthBootstrapEndpoint(endpoint);
+
+  // Enforce strict token validation & 2-minute pre-expiry proactive refresh on protected calls
+  if (!isBootstrap && (accessToken || refreshToken)) {
+    const accessInspect = accessToken
+      ? inspectJwtToken(accessToken, getJwtSecrets('access'))
+      : null;
+    const refreshInspect = refreshToken
+      ? inspectJwtToken(refreshToken, getJwtSecrets('refresh'))
+      : null;
+
+    const accessValid = Boolean(accessInspect?.valid);
+    const needsRefresh =
+      !accessValid || Boolean(accessInspect?.shouldProactivelyRefresh);
+
+    if (needsRefresh) {
+      if (refreshToken && (refreshInspect ? refreshInspect.valid : true)) {
+        const outcome = await refreshBackendSession(refreshToken);
+        if (outcome.ok && outcome.accessToken) {
+          accessToken = outcome.accessToken;
+          if (outcome.refreshToken) {
+            refreshToken = outcome.refreshToken;
+          }
+          try {
+            await applyAuthTokensCookies({
+              accessToken: outcome.accessToken,
+              refreshToken: outcome.refreshToken,
+            });
+          } catch {
+            // Cookie mutation throws inside Server Component render (proxy handles response cookies on SSR)
+          }
+        } else if (outcome.authRejected || !accessValid) {
+          try {
+            await clearAllAuthCookies();
+          } catch {
+            // Ignore in RSC render
+          }
+          if (!accessValid) {
+            return new Response(
+              JSON.stringify({
+                code: 'SESSION_EXPIRED',
+                message: 'Session has expired. Please sign in again.',
+              }),
+              {
+                status: 401,
+                headers: { 'Content-Type': 'application/json' },
+              },
+            );
+          }
+        }
+      } else if (!accessValid) {
+        try {
+          await clearAllAuthCookies();
+        } catch {
+          // Ignore in RSC render
+        }
+        return new Response(
+          JSON.stringify({
+            code: 'SESSION_EXPIRED',
+            message: 'Session has expired. Please sign in again.',
+          }),
+          {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        );
+      }
+    }
+  }
+
   const requestHeaders = new Headers(headers);
   const authCookies = [
     accessToken ? `access_token=${accessToken}` : null,
     refreshToken ? `refresh_token=${refreshToken}` : null,
   ].filter(Boolean);
 
-  if (authCookies.length > 0) {
+  if (authCookies.length > 0 && !requestHeaders.has('Cookie')) {
     requestHeaders.set('Cookie', authCookies.join('; '));
   }
 
@@ -160,25 +132,45 @@ const serverFetchHelper = async (
       ...restOptions,
     });
 
-    if (response.status === 401 && refreshToken && allowRetry) {
-      const newAccessToken = await refreshAccessToken();
-      if (newAccessToken) {
-        const retryHeaders = new Headers(headers);
-        retryHeaders.set('Authorization', `Bearer ${newAccessToken}`);
-        retryHeaders.set(
-          'Cookie',
-          [
-            `access_token=${newAccessToken}`,
-            refreshToken ? `refresh_token=${refreshToken}` : null,
-          ]
-            .filter(Boolean)
-            .join('; '),
-        );
-        return serverFetchHelper(
-          endpoint,
-          { ...restOptions, headers: retryHeaders },
-          false,
-        );
+    if (response.status === 401 && !isBootstrap) {
+      if (refreshToken && allowRetry) {
+        const outcome = await refreshBackendSession(refreshToken);
+        if (outcome.ok && outcome.accessToken) {
+          try {
+            await applyAuthTokensCookies({
+              accessToken: outcome.accessToken,
+              refreshToken: outcome.refreshToken,
+            });
+          } catch {
+            // Ignore in RSC render
+          }
+
+          const nextRefresh = outcome.refreshToken || refreshToken;
+          const retryHeaders = new Headers(headers);
+          retryHeaders.set('Authorization', `Bearer ${outcome.accessToken}`);
+          retryHeaders.set(
+            'Cookie',
+            [
+              `access_token=${outcome.accessToken}`,
+              nextRefresh ? `refresh_token=${nextRefresh}` : null,
+            ]
+              .filter(Boolean)
+              .join('; '),
+          );
+
+          return serverFetchHelper(
+            endpoint,
+            { ...restOptions, headers: retryHeaders },
+            false,
+          );
+        }
+      }
+
+      // Unrecoverable 401 -> wipe cookies best-effort
+      try {
+        await clearAllAuthCookies();
+      } catch {
+        // Ignore in RSC render
       }
     }
 

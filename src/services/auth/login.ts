@@ -1,10 +1,11 @@
 'use server';
 
-import { serverFetch, parseCookieString } from '@/lib/serverFetch';
+import { extractTokensFromAuthResponse } from '@/lib/auth-cookies';
 import { getDefaultDashboard } from '@/lib/auth-utils';
+import { getJwtSecrets, inspectJwtToken } from '@/lib/jwtHandler';
+import { serverFetch } from '@/lib/serverFetch';
 import { StaffUser } from '@/types/api';
-import { getDefaultCookieOptions } from './cookieOptions';
-import { setCookie } from './tokenHandler';
+import { applyAuthTokensCookies, clearAllAuthCookies } from './tokenHandler';
 
 export interface LoginActionResult {
   success: boolean;
@@ -50,58 +51,48 @@ export const login = async (
       };
     }
 
-    let accessTokenValue: string | null = result?.accessToken || null;
-    let refreshTokenValue: string | null = null;
+    const { accessToken: accessTokenValue, refreshToken: refreshTokenValue } =
+      extractTokensFromAuthResponse(res, result);
 
-    const setCookieHeaders = res.headers.getSetCookie();
-    if (setCookieHeaders?.length) {
-      for (const cookie of setCookieHeaders) {
-        const parsed = parseCookieString(cookie);
-        if (parsed.access_token || parsed.name === 'access_token') {
-          accessTokenValue =
-            parsed.access_token || parsed.value || accessTokenValue;
-        }
-        if (parsed.refresh_token || parsed.name === 'refresh_token') {
-          refreshTokenValue = parsed.refresh_token || parsed.value || null;
-        }
-      }
+    if (!accessTokenValue) {
+      return {
+        success: false,
+        message: 'Authentication token missing from server response',
+      };
     }
 
-    if (accessTokenValue) {
-      await setCookie('access_token', accessTokenValue, {
-        ...getDefaultCookieOptions(),
-        maxAge: 15 * 60,
-      });
-      await setCookie('accessToken', accessTokenValue, {
-        ...getDefaultCookieOptions(),
-        maxAge: 15 * 60,
-      });
+    const accessInspect = inspectJwtToken(
+      accessTokenValue,
+      getJwtSecrets('access'),
+    );
+    if (!accessInspect.valid) {
+      await clearAllAuthCookies();
+      return {
+        success: false,
+        message: 'Received invalid or expired authentication token',
+      };
     }
 
-    if (refreshTokenValue) {
-      await setCookie('refresh_token', refreshTokenValue, {
-        ...getDefaultCookieOptions(),
-        maxAge: 7 * 24 * 60 * 60,
-      });
-      await setCookie('refreshToken', refreshTokenValue, {
-        ...getDefaultCookieOptions(),
-        maxAge: 7 * 24 * 60 * 60,
-      });
+    const user: StaffUser | undefined = result?.user || result?.data?.user;
+    if (user?.status === 'INACTIVE') {
+      await clearAllAuthCookies();
+      return {
+        success: false,
+        message: 'Your staff account is inactive. Contact an administrator.',
+      };
     }
 
-    const user: StaffUser | undefined = result?.user;
-    if (user) {
-      await setCookie('userSession', JSON.stringify(user), {
-        ...getDefaultCookieOptions({ httpOnly: false }),
-        maxAge: 7 * 24 * 60 * 60,
-      });
-    }
+    await applyAuthTokensCookies({
+      accessToken: accessTokenValue,
+      refreshToken: refreshTokenValue,
+    });
 
     const defaultDashboard = getDefaultDashboard(user?.role);
     const isSafeCallback =
       callbackUrl.startsWith('/') &&
       !callbackUrl.startsWith('//') &&
-      !callbackUrl.includes('://');
+      !callbackUrl.includes('://') &&
+      !callbackUrl.includes('\\');
 
     return {
       success: true,

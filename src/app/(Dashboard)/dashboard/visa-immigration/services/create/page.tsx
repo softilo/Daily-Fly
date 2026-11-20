@@ -1,4 +1,5 @@
 import React from 'react';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { getAdminCountriesAction } from '@/services/visa/visa.service';
 import VisaServiceForm from '@/components/module/visa/VisaServiceForm';
 
@@ -6,6 +7,7 @@ import VisaServiceForm from '@/components/module/visa/VisaServiceForm';
 export const instant = false;
 
 export default async function CreateVisaServicePage() {
+  await requireStaffSession();
   const countriesRes = await getAdminCountriesAction({ limit: 100 });
   const countries = countriesRes?.data || [];
 

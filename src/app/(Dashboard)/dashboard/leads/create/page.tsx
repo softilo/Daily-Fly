@@ -1,9 +1,11 @@
+import { requireStaffSession } from '@/services/auth/getMe';
 import { ManagementPageHeader } from '@/components/shared/ManagementPageHeader';
 import { CreateLeadForm } from '@/components/module/leads/CreateLeadForm';
 
 export const instant = false;
 
-export default function CreateLeadPage() {
+export default async function CreateLeadPage() {
+  await requireStaffSession();
   return (
     <div>
       <ManagementPageHeader

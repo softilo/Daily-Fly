@@ -1,5 +1,4 @@
-import { redirect } from 'next/navigation';
-import { getMe } from '@/services/auth/getMe';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { getAgencySettings } from '@/services/settings/settings.service';
 import { ManagementPageHeader } from '@/components/shared/ManagementPageHeader';
 import { AgencySettingsForm } from '@/components/module/settings/AgencySettingsForm';
@@ -7,10 +6,7 @@ import { AgencySettingsForm } from '@/components/module/settings/AgencySettingsF
 export const instant = false;
 
 export default async function AgencySettingsPage() {
-  const user = await getMe();
-  if (!user || user.role !== 'OWNER_ADMIN') {
-    redirect('/dashboard?error=unauthorized');
-  }
+  await requireStaffSession(['OWNER_ADMIN']);
 
   const settings = await getAgencySettings();
 

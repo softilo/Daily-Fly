@@ -1,15 +1,20 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import {
+  ACCESS_COOKIE_NAME,
+  ALL_AUTH_COOKIE_NAMES,
+  AuthTokenPair,
+  clearAuthCookiesOnResponse,
+  clearLegacyAuthCookiesOnResponse,
+  getStaffPortalPath,
+  isSafeRelativePath,
+  LEGACY_DUPLICATE_COOKIE_NAMES,
+  REFRESH_COOKIE_NAME,
+  setAuthCookiesOnResponse,
+} from '@/lib/auth-cookies';
+import { refreshBackendSession } from '@/lib/auth-refresh';
+import { getJwtSecrets, inspectJwtToken } from '@/lib/jwtHandler';
 import { StaffRole } from '@/types/api';
-
-const AUTH_COOKIES = [
-  'access_token',
-  'accessToken',
-  'refresh_token',
-  'refreshToken',
-  'userSession',
-] as const;
 
 const ADMIN_ONLY_PREFIXES = [
   '/dashboard/staff',
@@ -22,121 +27,117 @@ const PROTECTED_PAGE_PREFIXES = ['/dashboard', '/my-profile', '/change-password'
 const PROTECTED_API_PREFIXES = ['/api/quotations'];
 const HIDDEN_PUBLIC_AUTH_PROBES = ['/login', '/signin', '/admin', '/staff-login'];
 
-function getStaffPortalPath(): string {
-  const raw = process.env.STAFF_LOGIN_PATH?.trim() || '/office-portal';
-  const normalized = raw.startsWith('/') ? raw : `/${raw}`;
-  return normalized.length > 1 && normalized.endsWith('/')
-    ? normalized.slice(0, -1)
-    : normalized;
-}
-
-interface DecodedSession {
+interface ProxySessionResult {
   hasValidSession: boolean;
   role?: StaffRole;
   status?: string;
+  shouldClearCookies: boolean;
+  refreshedTokens?: AuthTokenPair;
 }
 
-function isSafeRelativePath(path: string): boolean {
-  return (
-    path.startsWith('/') &&
-    !path.startsWith('//') &&
-    !path.includes('://') &&
-    !path.includes('\\')
-  );
-}
+function buildForwardedCookieHeader(
+  request: NextRequest,
+  tokens: AuthTokenPair,
+): string {
+  const excluded = new Set<string>(ALL_AUTH_COOKIE_NAMES);
+  const parts = request.cookies
+    .getAll()
+    .filter((c) => !excluded.has(c.name))
+    .map((c) => `${c.name}=${c.value}`);
 
-function decodeJwtSafely(token: string, secrets: string[]): JwtPayload | null {
-  for (const secret of secrets) {
-    try {
-      const verified = jwt.verify(token, secret);
-      if (verified && typeof verified === 'object') {
-        return verified as JwtPayload;
-      }
-    } catch {
-      // Try next secret or fall back if backend uses a different signing key
-    }
+  parts.push(`${ACCESS_COOKIE_NAME}=${tokens.accessToken}`);
+  if (tokens.refreshToken) {
+    parts.push(`${REFRESH_COOKIE_NAME}=${tokens.refreshToken}`);
   }
 
-  try {
-    const decoded = jwt.decode(token);
-    if (!decoded || typeof decoded !== 'object') return null;
-    const payload = decoded as JwtPayload;
-    if (payload.exp && payload.exp * 1000 <= Date.now()) {
-      return null;
-    }
-    return payload;
-  } catch {
-    return null;
-  }
+  return parts.join('; ');
 }
 
-function inspectSession(request: NextRequest): DecodedSession {
-  const accessToken =
+async function resolveProxySession(
+  request: NextRequest,
+  shouldAttemptRefresh: boolean,
+): Promise<ProxySessionResult> {
+  const initialAccessToken =
     request.cookies.get('access_token')?.value ||
     request.cookies.get('accessToken')?.value;
-  const refreshToken =
+  const initialRefreshToken =
     request.cookies.get('refresh_token')?.value ||
     request.cookies.get('refreshToken')?.value;
 
-  const accessSecrets = [
-    process.env.JWT_ACCESS_SECRET,
-    process.env.JWT_SECRET,
-  ].filter((v): v is string => Boolean(v));
-  const refreshSecrets = [
-    process.env.JWT_REFRESH_SECRET,
-    process.env.JWT_SECRET,
-  ].filter((v): v is string => Boolean(v));
+  const hasAnyAuthCookie = Boolean(
+    initialAccessToken ||
+      initialRefreshToken ||
+      request.cookies.get('userSession')?.value,
+  );
 
-  const accessPayload = accessToken
-    ? decodeJwtSafely(accessToken, accessSecrets)
-    : null;
-  const refreshPayload = refreshToken
-    ? decodeJwtSafely(refreshToken, refreshSecrets)
-    : null;
-
-  // Keep session active if either a valid access token or a valid refresh token exists
-  // (serverFetch will transparently rotate expired access tokens via refresh_token)
-  const activePayload = accessPayload || refreshPayload;
-  if (!activePayload) {
-    return { hasValidSession: false };
+  if (!initialAccessToken && !initialRefreshToken) {
+    return {
+      hasValidSession: false,
+      shouldClearCookies: hasAnyAuthCookie,
+    };
   }
 
-  let role = activePayload.role as StaffRole | undefined;
-  let status = activePayload.status as string | undefined;
+  const accessSecrets = getJwtSecrets('access');
+  const refreshSecrets = getJwtSecrets('refresh');
 
-  const userSessionRaw = request.cookies.get('userSession')?.value;
-  if (userSessionRaw) {
-    try {
-      const parsed = JSON.parse(userSessionRaw) as {
-        role?: StaffRole;
-        status?: string;
+  let accessInspect = initialAccessToken
+    ? inspectJwtToken(initialAccessToken, accessSecrets)
+    : null;
+  const refreshInspect = initialRefreshToken
+    ? inspectJwtToken(initialRefreshToken, refreshSecrets)
+    : null;
+
+  let refreshedTokens: AuthTokenPair | undefined;
+  const refreshTokenIsValid = Boolean(
+    initialRefreshToken && (refreshInspect ? refreshInspect.valid : true),
+  );
+
+  // Trigger refresh when access token is missing/expired OR within 2 minutes of expiring
+  const needsRefresh =
+    !accessInspect?.valid || Boolean(accessInspect?.shouldProactivelyRefresh);
+
+  if (shouldAttemptRefresh && needsRefresh && initialRefreshToken && refreshTokenIsValid) {
+    const outcome = await refreshBackendSession(initialRefreshToken);
+    if (outcome.ok && outcome.accessToken) {
+      refreshedTokens = {
+        accessToken: outcome.accessToken,
+        refreshToken: outcome.refreshToken || initialRefreshToken,
       };
-      if (!role && parsed.role) role = parsed.role;
-      if (!status && parsed.status) status = parsed.status;
-    } catch {
-      // Ignore malformed non-httpOnly userSession cookie
+      accessInspect = inspectJwtToken(outcome.accessToken, accessSecrets);
+    } else if (outcome.authRejected) {
+      return {
+        hasValidSession: false,
+        shouldClearCookies: true,
+      };
     }
   }
 
+  if (!accessInspect?.valid || !accessInspect.payload) {
+    return {
+      hasValidSession: false,
+      shouldClearCookies: hasAnyAuthCookie,
+    };
+  }
+
+  const role = accessInspect.payload.role as StaffRole | undefined;
+  const status = accessInspect.payload.status as string | undefined;
+
   if (status === 'INACTIVE') {
-    return { hasValidSession: false, role, status };
+    return {
+      hasValidSession: false,
+      role,
+      status,
+      shouldClearCookies: true,
+    };
   }
 
   return {
     hasValidSession: true,
     role,
     status,
+    shouldClearCookies: false,
+    refreshedTokens,
   };
-}
-
-function clearAuthCookies(response: NextResponse): void {
-  for (const name of AUTH_COOKIES) {
-    response.cookies.set(name, '', {
-      path: '/',
-      maxAge: 0,
-      expires: new Date(0),
-    });
-  }
 }
 
 function applySecurityHeaders(
@@ -214,6 +215,7 @@ export async function proxy(request: NextRequest) {
     return applySecurityHeaders(notFoundRes, true);
   }
 
+  const isAuthApiRoute = pathname.startsWith('/api/auth/');
   const isProtectedPage = PROTECTED_PAGE_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
@@ -224,9 +226,13 @@ export async function proxy(request: NextRequest) {
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
   const isPrivateRoute =
-    isProtectedPage || isProtectedApi || isSecretPortal;
+    isProtectedPage || isProtectedApi || isSecretPortal || isAuthApiRoute;
 
-  const session = inspectSession(request);
+  // Let /api/auth/* endpoints handle their own session/refresh lifecycle without proxy pre-refresh
+  const session = await resolveProxySession(
+    request,
+    (isProtectedPage || isProtectedApi || isSecretPortal) && !isAuthApiRoute,
+  );
 
   // 3. Protect private API routes with strict 401 JSON response
   if (isProtectedApi && !session.hasValidSession) {
@@ -234,14 +240,14 @@ export async function proxy(request: NextRequest) {
       { success: false, message: 'Authentication required' },
       { status: 401 },
     );
-    clearAuthCookies(res);
+    clearAuthCookiesOnResponse(res);
     return applySecurityHeaders(res, true);
   }
 
-  // 4. Protect Dashboard & staff account routes (redirect intruders to / without leaking portal URL)
+  // 4. Protect Dashboard & staff account routes (redirect expired/unauthorized callers without leaking portal URL)
   if (isProtectedPage && !session.hasValidSession) {
     const res = NextResponse.redirect(new URL('/', request.url));
-    clearAuthCookies(res);
+    clearAuthCookiesOnResponse(res);
     return applySecurityHeaders(res, true);
   }
 
@@ -250,6 +256,9 @@ export async function proxy(request: NextRequest) {
     const fallbackUrl = new URL('/dashboard', request.url);
     fallbackUrl.searchParams.set('error', 'unauthorized');
     const res = NextResponse.redirect(fallbackUrl);
+    if (session.refreshedTokens) {
+      setAuthCookiesOnResponse(res, session.refreshedTokens);
+    }
     return applySecurityHeaders(res, true);
   }
 
@@ -261,16 +270,28 @@ export async function proxy(request: NextRequest) {
         ? callbackUrl
         : '/dashboard';
       const res = NextResponse.redirect(new URL(destination, request.url));
+      if (session.refreshedTokens) {
+        setAuthCookiesOnResponse(res, session.refreshedTokens);
+      }
       return applySecurityHeaders(res, true);
     }
 
     const internalLoginUrl = new URL(`/login${search}`, request.url);
     const res = NextResponse.rewrite(internalLoginUrl);
+    if (session.shouldClearCookies) {
+      clearAuthCookiesOnResponse(res);
+    }
     return applySecurityHeaders(res, true);
   }
 
-  // 7. Attach security headers & verified request context headers downstream
+  // 7. Attach security headers & refreshed cookies/context downstream
   const requestHeaders = new Headers(request.headers);
+  if (session.refreshedTokens) {
+    requestHeaders.set(
+      'cookie',
+      buildForwardedCookieHeader(request, session.refreshedTokens),
+    );
+  }
   if (session.hasValidSession && session.role) {
     requestHeaders.set('x-staff-role', session.role);
   }
@@ -280,6 +301,18 @@ export async function proxy(request: NextRequest) {
       headers: requestHeaders,
     },
   });
+
+  if (session.refreshedTokens) {
+    setAuthCookiesOnResponse(response, session.refreshedTokens);
+  } else if (session.shouldClearCookies && isPrivateRoute && !isAuthApiRoute) {
+    clearAuthCookiesOnResponse(response);
+  } else if (
+    session.hasValidSession &&
+    request.cookies.has(ACCESS_COOKIE_NAME) &&
+    LEGACY_DUPLICATE_COOKIE_NAMES.some((name) => request.cookies.has(name))
+  ) {
+    clearLegacyAuthCookiesOnResponse(response);
+  }
 
   return applySecurityHeaders(response, isPrivateRoute);
 }

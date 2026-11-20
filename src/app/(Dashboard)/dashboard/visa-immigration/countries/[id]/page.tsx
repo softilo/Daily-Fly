@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { getAdminCountryByIdAction } from '@/services/visa/visa.service';
 import CountryForm from '@/components/module/visa/CountryForm';
 import {
@@ -17,6 +18,7 @@ export default async function EditCountryPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireStaffSession();
   const { id } = await params;
   const country = await getAdminCountryByIdAction(id);
 

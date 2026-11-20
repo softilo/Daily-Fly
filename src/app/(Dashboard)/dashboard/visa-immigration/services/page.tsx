@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { getAdminVisaServicesAction } from '@/services/visa/visa.service';
 import {
   AgencyServiceStatusBadge,
@@ -26,6 +27,7 @@ export default async function AdminVisaServicesListPage({
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
+  await requireStaffSession();
   const params = await searchParams;
   const page = Number(params.page) || 1;
   const limit = Number(params.limit) || 10;

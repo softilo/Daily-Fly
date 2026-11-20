@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ExternalLink, MessageSquare, Phone } from 'lucide-react';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { getLeads } from '@/services/leads/leads.service';
 import { ManagementPageHeader } from '@/components/shared/ManagementPageHeader';
 import { Card, CardContent } from '@/components/ui/card';
@@ -72,6 +73,7 @@ const SORT_BY_OPTIONS = [
 export default async function DashboardLeadsPage({
   searchParams,
 }: LeadsPageProps) {
+  await requireStaffSession();
   const resolvedParams = (await searchParams) ?? {};
   const page = Math.max(1, Number(resolvedParams.page) || 1);
   const limit = Math.min(100, Math.max(1, Number(resolvedParams.limit) || 20));

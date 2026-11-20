@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { getDashboardSummary } from '@/services/dashboard/dashboard.service';
 import { getLeads } from '@/services/leads/leads.service';
 import { ManagementPageHeader } from '@/components/shared/ManagementPageHeader';
@@ -25,7 +26,8 @@ const ORDERED_STAGES: ReadonlyArray<{
 ];
 
 export default async function DashboardOverviewPage() {
-  const [summary, recentLeadsRes] = await Promise.all([
+  const [, summary, recentLeadsRes] = await Promise.all([
+    requireStaffSession(),
     getDashboardSummary(),
     getLeads({ page: 1, limit: 5, sortBy: 'createdAt', sortOrder: 'desc' }),
   ]);

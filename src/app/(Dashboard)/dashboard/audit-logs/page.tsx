@@ -1,5 +1,4 @@
-import { redirect } from 'next/navigation';
-import { getMe } from '@/services/auth/getMe';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { getAuditLogs } from '@/services/audit/audit.service';
 import { ManagementPageHeader } from '@/components/shared/ManagementPageHeader';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,10 +8,7 @@ import { formatDate, formatTime } from '@/lib/utils';
 export const instant = false;
 
 export default async function AuditLogsPage() {
-  const user = await getMe();
-  if (!user || user.role !== 'OWNER_ADMIN') {
-    redirect('/dashboard?error=unauthorized');
-  }
+  await requireStaffSession(['OWNER_ADMIN']);
 
   const logsRes = await getAuditLogs();
 

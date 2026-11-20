@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import { getMe } from '@/services/auth/getMe';
+import {
+  getCurrentAccessTiming,
+  requireStaffSession,
+} from '@/services/auth/getMe';
 import { getLiveBrandInfo } from '@/services/settings/settings.service';
 import { BrandProvider } from '@/components/providers/BrandProvider';
+import { SessionSecurityGuard } from '@/components/providers/SessionSecurityGuard';
 import { DashboardSidebar } from '@/components/module/dashboard/DashboardSidebar';
 import { DashboardNavbar } from '@/components/module/dashboard/DashboardNavbar';
 
@@ -23,14 +26,18 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, brand] = await Promise.all([getMe(), getLiveBrandInfo()]);
-
-  if (!user) {
-    redirect('/');
-  }
+  const [user, brand, accessTiming] = await Promise.all([
+    requireStaffSession(),
+    getLiveBrandInfo(),
+    getCurrentAccessTiming(),
+  ]);
 
   return (
     <BrandProvider brand={brand}>
+      <SessionSecurityGuard
+        initialAccessExpiresAtMs={accessTiming.expiresAtMs}
+        initialAccessIssuedAtMs={accessTiming.issuedAtMs}
+      />
       <div className="min-h-screen bg-[#FAF9F6]">
         <DashboardSidebar role={user.role} />
         <div className="md:pl-64 flex flex-col min-h-screen">

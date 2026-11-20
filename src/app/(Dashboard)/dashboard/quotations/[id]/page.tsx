@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getSingleQuotation } from '@/services/quotations/quotations.service';
-import { getMe } from '@/services/auth/getMe';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { ManagementPageHeader } from '@/components/shared/ManagementPageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -17,10 +17,10 @@ export default async function QuotationDetailPage({
   const { id } = await params;
   const [quotation, user] = await Promise.all([
     getSingleQuotation(id),
-    getMe(),
+    requireStaffSession(),
   ]);
 
-  if (!quotation || !user) {
+  if (!quotation) {
     notFound();
   }
 

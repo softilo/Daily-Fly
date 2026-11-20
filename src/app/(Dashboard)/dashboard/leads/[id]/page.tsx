@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
-import { getMe } from '@/services/auth/getMe';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { getSingleLead } from '@/services/leads/leads.service';
 import { getPackages } from '@/services/packages/packages.service';
 import { getAdminVisaServicesAction } from '@/services/visa/visa.service';
@@ -21,7 +21,7 @@ export default async function LeadDetailsPage({
     getSingleLead(id),
     getPackages({ limit: 50, isArchived: false }),
     getAdminVisaServicesAction({ limit: 50, publicationStatus: 'PUBLISHED' }),
-    getMe(),
+    requireStaffSession(),
   ]);
 
   if (!lead) {

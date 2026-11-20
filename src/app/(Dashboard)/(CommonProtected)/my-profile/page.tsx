@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Lock } from 'lucide-react';
-import { getMe } from '@/services/auth/getMe';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { ManagementPageHeader } from '@/components/shared/ManagementPageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 export const instant = false;
 
 export default async function MyProfilePage() {
-  const user = await getMe();
+  const user = await requireStaffSession();
   return (
     <div className="space-y-6">
       <ManagementPageHeader

@@ -1,19 +1,18 @@
 'use client';
 
 import { useTransition } from 'react';
-import { useRouter } from 'next/navigation';
 import { logout } from '@/services/auth/logout';
+import { broadcastAuthSync } from '@/lib/auth-broadcast';
 import { Button } from '@/components/ui/button';
 
 export function LogoutBtn() {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const handleLogout = () => {
     startTransition(async () => {
-      await logout();
-      router.push('/');
-      router.refresh();
+      await logout().catch(() => null);
+      broadcastAuthSync({ type: 'SIGNED_OUT' });
+      window.location.replace('/');
     });
   };
 

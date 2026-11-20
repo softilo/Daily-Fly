@@ -1,12 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { ExternalLink, Plus } from 'lucide-react';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { getVisaAdminOverviewAction } from '@/services/visa/visa.service';
 import { VisaSubNav } from '@/components/module/visa/VisaSubNav';
 
 export const instant = false;
 
 export default async function VisaImmigrationOverviewPage() {
+  await requireStaffSession();
   const stats = (await getVisaAdminOverviewAction()) || {
     totalCountries: 0,
     countriesWithPublishedServices: 0,

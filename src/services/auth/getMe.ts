@@ -1,49 +1,92 @@
-'use server';
-
+import { cache } from 'react';
+import { redirect } from 'next/navigation';
+import { extractStaffUserPayload } from '@/lib/auth-cookies';
+import { getJwtSecrets, inspectJwtToken } from '@/lib/jwtHandler';
 import { serverFetch } from '@/lib/serverFetch';
-import { getCookies, setCookie } from './tokenHandler';
-import { getDefaultCookieOptions } from './cookieOptions';
-import { StaffUser } from '@/types/api';
+import { StaffRole, StaffUser } from '@/types/api';
+import {
+  clearAllAuthCookies,
+  getAuthTokenPairFromCookies,
+} from './tokenHandler';
 
-export async function getMe(): Promise<StaffUser | null> {
-  const token =
-    (await getCookies('access_token')) ||
-    (await getCookies('accessToken')) ||
-    (await getCookies('refresh_token'));
+export const getMe = cache(async (): Promise<StaffUser | null> => {
+  const { accessToken, refreshToken } = await getAuthTokenPairFromCookies();
+  if (!accessToken && !refreshToken) {
+    return null;
+  }
 
-  if (!token) return null;
+  const accessInspect = accessToken
+    ? inspectJwtToken(accessToken, getJwtSecrets('access'))
+    : null;
+  const refreshInspect = refreshToken
+    ? inspectJwtToken(refreshToken, getJwtSecrets('refresh'))
+    : null;
+
+  if (!accessInspect?.valid && !refreshInspect?.valid) {
+    return null;
+  }
 
   try {
     const res = await serverFetch.get('/auth/me');
-    if (res.ok) {
-      const data = (await res.json()) as StaffUser;
-      if (data?.id) {
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
         try {
-          await setCookie('userSession', JSON.stringify(data), {
-            ...getDefaultCookieOptions({ httpOnly: false }),
-            maxAge: 7 * 24 * 60 * 60,
-          });
+          await clearAllAuthCookies();
         } catch {
-          // Ignore cookie write inside static RSC render
+          // Ignore in RSC render
         }
-        return data;
       }
-    }
-  } catch {
-    // Fall back to cached session if backend is temporarily unreachable
-  }
-
-  const sessionStr = await getCookies('userSession');
-  if (sessionStr) {
-    try {
-      const parsed = JSON.parse(sessionStr) as StaffUser;
-      if (parsed?.id && parsed?.role) {
-        return parsed;
-      }
-    } catch {
       return null;
     }
-  }
 
-  return null;
+    const raw = await res.json().catch(() => null);
+    const user = extractStaffUserPayload(raw);
+
+    if (!user?.id || user.status === 'INACTIVE') {
+      try {
+        await clearAllAuthCookies();
+      } catch {
+        // Ignore in RSC render
+      }
+      return null;
+    }
+
+    return user;
+  } catch {
+    return null;
+  }
+});
+
+export async function requireStaffSession(
+  allowedRoles?: StaffRole[],
+): Promise<StaffUser> {
+  const user = await getMe();
+  if (!user) {
+    redirect('/');
+  }
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    redirect('/dashboard?error=unauthorized');
+  }
+  return user;
 }
+
+export const getCurrentAccessTiming = cache(
+  async (): Promise<{ expiresAtMs: number | null; issuedAtMs: number | null }> => {
+    const { accessToken } = await getAuthTokenPairFromCookies();
+    if (!accessToken) {
+      return { expiresAtMs: null, issuedAtMs: null };
+    }
+
+    const inspect = inspectJwtToken(accessToken, getJwtSecrets('access'), {
+      requireIdentity: false,
+    });
+    if (!inspect.valid) {
+      return { expiresAtMs: null, issuedAtMs: null };
+    }
+
+    return {
+      expiresAtMs: inspect.expiresAtMs ?? null,
+      issuedAtMs: inspect.issuedAtMs ?? null,
+    };
+  },
+);

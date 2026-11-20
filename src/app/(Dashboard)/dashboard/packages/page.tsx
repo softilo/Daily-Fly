@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getPackages } from '@/services/packages/packages.service';
-import { getMe } from '@/services/auth/getMe';
+import { requireStaffSession } from '@/services/auth/getMe';
 import { ManagementPageHeader } from '@/components/shared/ManagementPageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -29,7 +29,7 @@ export default async function DashboardPackagesPage({
       isArchived: false,
       category: activeCategory,
     }),
-    getMe(),
+    requireStaffSession(),
   ]);
 
   const isAdmin = user?.role === 'OWNER_ADMIN';
