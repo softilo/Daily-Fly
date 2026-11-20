@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
@@ -14,6 +15,8 @@ import {
   getPublicCountriesAction,
   getPublicVisaServicesAction,
 } from '@/services/visa/visa.service';
+import { JsonLd } from '@/components/shared/JsonLd';
+import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
 import {
   AgencyServiceStatusBadge,
   CountryCoverageBadge,
@@ -30,6 +33,47 @@ import {
 } from '@/types/api';
 
 export const instant = false;
+
+const VISA_CATEGORY_LABELS: Record<string, string> = {
+  STUDENT_VISA: 'Student Visa',
+  WORK_PERMIT: 'Work Permit',
+  WORK_VISA: 'Work Visa',
+  TOURIST_VISA: 'Tourist Visa',
+  BUSINESS_VISA: 'Business Visa',
+};
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const category = params.category || '';
+  const categoryLabel = VISA_CATEGORY_LABELS[category];
+
+  if (categoryLabel) {
+    return buildPageMetadata({
+      title: `${categoryLabel} Requirements & Assistance`,
+      description: `Check verified ${categoryLabel.toLowerCase()} checklists, destination countries, embassy timelines, and consultancy support from Daily Fly Travel & Tours.`,
+      path: `/visa-services?category=${category}`,
+      ogImage: '/images/visa-hero-bg.jpg',
+      keywords: [
+        `${categoryLabel} Bangladesh`,
+        `${categoryLabel} Checklist`,
+        'Visa Assistance Bangladesh',
+        'Daily Fly Travel & Tours',
+      ],
+    });
+  }
+
+  return buildPageMetadata({
+    title: 'Destination Countries & Visa Services',
+    description:
+      'Verified work permit checklists, student visa requirements, tourist visa guidance, and destination country coverage from Daily Fly Travel & Tours.',
+    path: '/visa-services',
+    ogImage: '/images/visa-hero-bg.jpg',
+  });
+}
 
 const VISA_CATEGORY_TABS: Array<{ label: string; value: string; Icon: LucideIcon }> = [
   { label: 'All Categories', value: '', Icon: Globe },
@@ -65,6 +109,12 @@ export default async function PublicVisaServicesPage({
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: 'Home', path: '/' },
+          { name: 'Visa & Immigration Services', path: '/visa-services' },
+        ])}
+      />
       {/* Compact Photographic Visa & Immigration Banner */}
       <section className="relative overflow-hidden border-b border-[#062416] bg-[#062416] pt-8 pb-12 text-white sm:pt-10 sm:pb-14">
         <Image

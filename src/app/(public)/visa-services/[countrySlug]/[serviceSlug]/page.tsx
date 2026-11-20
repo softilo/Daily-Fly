@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { cache } from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPublicVisaServiceDetailAction } from '@/services/visa/visa.service';
+import { getLiveBrandInfo } from '@/services/settings/settings.service';
+import { JsonLd } from '@/components/shared/JsonLd';
+import {
+  buildBreadcrumbJsonLd,
+  buildPageMetadata,
+  buildVisaServiceJsonLd,
+} from '@/lib/seo';
 import {
   AgencyServiceStatusBadge,
   VisaCategoryBadge,
@@ -11,13 +19,59 @@ import { VisaServiceRequirement } from '@/types/api';
 
 export const instant = false;
 
+const getCachedVisaService = cache(
+  (countrySlug: string, serviceSlug: string) =>
+    getPublicVisaServiceDetailAction(countrySlug, serviceSlug),
+);
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ countrySlug: string; serviceSlug: string }>;
+}): Promise<Metadata> {
+  const { countrySlug, serviceSlug } = await params;
+  const [service, brand] = await Promise.all([
+    getCachedVisaService(countrySlug, serviceSlug),
+    getLiveBrandInfo(),
+  ]);
+
+  if (!service || !service.country) {
+    return buildPageMetadata({
+      title: 'Visa Service Not Found',
+      description: 'Requested visa service checklist could not be found.',
+      path: `/visa-services/${countrySlug}/${serviceSlug}`,
+      noIndex: true,
+      siteName: brand.agencyName,
+    });
+  }
+
+  return buildPageMetadata({
+    title: `${service.title} — ${service.country.name}`,
+    description:
+      service.shortDescription ||
+      `View document requirements, processing timeline, and apply for ${service.title} in ${service.country.name} via ${brand.agencyName}.`,
+    path: `/visa-services/${service.country.slug}/${service.slug}`,
+    ogImage: '/images/visa-hero-bg.jpg',
+    siteName: brand.agencyName,
+    keywords: [
+      `${service.country.name} ${service.title}`,
+      `${service.country.name} visa checklist`,
+      `${service.country.name} visa requirements`,
+      brand.agencyName,
+    ],
+  });
+}
+
 export default async function VisaServiceDetailPage({
   params,
 }: {
   params: Promise<{ countrySlug: string; serviceSlug: string }>;
 }) {
   const { countrySlug, serviceSlug } = await params;
-  const service = await getPublicVisaServiceDetailAction(countrySlug, serviceSlug);
+  const [service, brand] = await Promise.all([
+    getCachedVisaService(countrySlug, serviceSlug),
+    getLiveBrandInfo(),
+  ]);
 
   if (!service || !service.country) {
     notFound();
@@ -29,6 +83,18 @@ export default async function VisaServiceDetailPage({
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] py-10">
+      <JsonLd data={buildVisaServiceJsonLd(service, brand)} />
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: 'Home', path: '/' },
+          { name: 'Visa & Immigration', path: '/visa-services' },
+          { name: country.name, path: `/visa-services/${country.slug}` },
+          {
+            name: service.title,
+            path: `/visa-services/${country.slug}/${service.slug}`,
+          },
+        ])}
+      />
       <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-500">

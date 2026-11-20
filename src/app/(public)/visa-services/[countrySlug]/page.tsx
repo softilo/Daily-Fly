@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { cache } from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPublicCountryBySlugAction } from '@/services/visa/visa.service';
+import { getLiveBrandInfo } from '@/services/settings/settings.service';
+import { JsonLd } from '@/components/shared/JsonLd';
+import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
 import {
   AgencyServiceStatusBadge,
   CountryCoverageBadge,
@@ -11,13 +15,56 @@ import { VisaService } from '@/types/api';
 
 export const instant = false;
 
+const getCachedCountry = cache((slug: string) =>
+  getPublicCountryBySlugAction(slug),
+);
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ countrySlug: string }>;
+}): Promise<Metadata> {
+  const { countrySlug } = await params;
+  const [country, brand] = await Promise.all([
+    getCachedCountry(countrySlug),
+    getLiveBrandInfo(),
+  ]);
+
+  if (!country) {
+    return buildPageMetadata({
+      title: 'Destination Not Found',
+      description: 'Requested destination country profile could not be found.',
+      path: `/visa-services/${countrySlug}`,
+      noIndex: true,
+      siteName: brand.agencyName,
+    });
+  }
+
+  return buildPageMetadata({
+    title: `${country.name} Visa & Work Permit Services`,
+    description:
+      country.shortIntro ||
+      `Explore verified visa categories, document checklists, and immigration consultancy services for ${country.name} with ${brand.agencyName}.`,
+    path: `/visa-services/${country.slug}`,
+    ogImage: '/images/visa-hero-bg.jpg',
+    siteName: brand.agencyName,
+    keywords: [
+      `${country.name} Visa Bangladesh`,
+      `${country.name} Work Permit`,
+      `${country.name} Student Visa`,
+      `${country.name} Tourist Visa`,
+      brand.agencyName,
+    ],
+  });
+}
+
 export default async function CountryVisaDetailPage({
   params,
 }: {
   params: Promise<{ countrySlug: string }>;
 }) {
   const { countrySlug } = await params;
-  const country = await getPublicCountryBySlugAction(countrySlug);
+  const country = await getCachedCountry(countrySlug);
 
   if (!country) {
     notFound();
@@ -27,6 +74,13 @@ export default async function CountryVisaDetailPage({
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] py-10">
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: 'Home', path: '/' },
+          { name: 'Visa & Immigration', path: '/visa-services' },
+          { name: country.name, path: `/visa-services/${country.slug}` },
+        ])}
+      />
       <div className="mx-auto max-w-6xl space-y-8 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
           <Link href="/visa-services" className="hover:text-[#0A3A23]">

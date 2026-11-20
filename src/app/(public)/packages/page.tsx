@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -5,6 +6,8 @@ import type { LucideIcon } from 'lucide-react';
 import { Globe, Landmark, Layers, Palmtree } from 'lucide-react';
 import { getPackages } from '@/services/packages/packages.service';
 import { PackagePreviewCard } from '@/components/common/PackagePreviewCard';
+import { JsonLd } from '@/components/shared/JsonLd';
+import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/seo';
 import {
   isPackageCategory,
   PACKAGE_CATEGORIES,
@@ -22,6 +25,53 @@ interface PublicPackagesPageProps {
     category?: ServiceCategory;
     search?: string;
   }>;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: PublicPackagesPageProps): Promise<Metadata> {
+  const resolved = (await searchParams) ?? {};
+  const category = resolved.category;
+
+  if (category === 'HAJJ_UMRAH') {
+    return buildPageMetadata({
+      title: 'Hajj & Umrah Packages',
+      description:
+        'Explore VIP & economy Hajj and Umrah packages with hotel distance details, guided Ziyarat, airfare, and transparent pricing.',
+      path: '/packages?category=HAJJ_UMRAH',
+      ogImage: '/images/packages-hero-bg.jpg',
+      keywords: [
+        'Hajj Packages Bangladesh',
+        'Umrah Packages Feni',
+        'VIP Umrah Package',
+        'Daily Fly Hajj & Umrah',
+      ],
+    });
+  }
+
+  if (category === 'TOUR') {
+    return buildPageMetadata({
+      title: 'Holiday & Group Tour Packages',
+      description:
+        'Curated domestic and international holiday tour packages from Bangladesh with transparent hotel, transfer, and flight inclusions.',
+      path: '/packages?category=TOUR',
+      ogImage: '/images/packages-hero-bg.jpg',
+      keywords: [
+        'Holiday Tour Packages Bangladesh',
+        'Coxs Bazar Tour Package',
+        'Dubai Tour Package Bangladesh',
+        'Daily Fly Holiday Tours',
+      ],
+    });
+  }
+
+  return buildPageMetadata({
+    title: 'Tour & Hajj Packages',
+    description:
+      'Browse curated domestic & international holiday tours, transparent inclusions, and VIP & economy Hajj & Umrah packages from Daily Fly Travel & Tours.',
+    path: '/packages',
+    ogImage: '/images/packages-hero-bg.jpg',
+  });
 }
 
 const PACKAGE_ICONS: Partial<Record<ServiceCategory, LucideIcon>> = {
@@ -54,6 +104,12 @@ export default async function PublicPackagesPage({
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: 'Home', path: '/' },
+          { name: 'Tour & Hajj Packages', path: '/packages' },
+        ])}
+      />
       {/* Compact Photographic Packages Banner */}
       <section className="relative overflow-hidden border-b border-[#062416] bg-[#062416] pt-8 pb-12 text-white sm:pt-10 sm:pb-14">
         <Image

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getLiveBrandInfo } from '@/services/settings/settings.service';
+import { NO_INDEX_ROBOTS } from '@/lib/seo';
 import { BrandProvider } from '@/components/providers/BrandProvider';
 import { Logo } from '@/components/shared/Logo';
 
@@ -9,6 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const brand = await getLiveBrandInfo();
   return {
     title: `Staff Sign In | ${brand.agencyName}`,
+    robots: NO_INDEX_ROBOTS,
   };
 }
 

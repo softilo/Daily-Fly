@@ -1,15 +1,29 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getPackages } from '@/services/packages/packages.service';
 import { getPublicCountriesAction } from '@/services/visa/visa.service';
+import { getLiveBrandInfo } from '@/services/settings/settings.service';
+import { buildPageMetadata } from '@/lib/seo';
 import { HeroSection } from '@/components/module/Home/HeroSection';
 import { FeaturesSection } from '@/components/module/Home/FeaturesSection';
 import { PackagePreviewCard } from '@/components/common/PackagePreviewCard';
 import { CountryCoverageBadge } from '@/components/module/visa/VisaStatusBadges';
 import { Button } from '@/components/ui/button';
-import { isPackageCategory } from '@/config/brand.config';
+import { brandConfig, isPackageCategory } from '@/config/brand.config';
 import { Country } from '@/types/api';
 
 export const instant = false;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await getLiveBrandInfo();
+  return buildPageMetadata({
+    title: brand.agencyName,
+    absoluteTitle: `${brand.agencyName} | ${brand.tagline}`,
+    description: brandConfig.seo.description,
+    path: '/',
+    siteName: brand.agencyName,
+  });
+}
 
 export default async function PublicHomePage() {
   const [packagesRes, countriesRes] = await Promise.all([

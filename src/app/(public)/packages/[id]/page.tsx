@@ -1,8 +1,16 @@
+import { cache } from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Check, ClipboardList, Phone, X } from 'lucide-react';
 import { getSinglePackage } from '@/services/packages/packages.service';
 import { getLiveBrandInfo } from '@/services/settings/settings.service';
+import { JsonLd } from '@/components/shared/JsonLd';
+import {
+  buildBreadcrumbJsonLd,
+  buildPackageJsonLd,
+  buildPageMetadata,
+} from '@/lib/seo';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -11,6 +19,51 @@ import { isPackageCategory, SECTOR_CATALOG } from '@/config/brand.config';
 
 export const instant = false;
 
+const getCachedPackage = cache((id: string) => getSinglePackage(id));
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const [pkg, brand] = await Promise.all([
+    getCachedPackage(id),
+    getLiveBrandInfo(),
+  ]);
+
+  if (!pkg) {
+    return buildPageMetadata({
+      title: 'Package Not Found',
+      description: 'Requested travel package could not be found.',
+      path: `/packages/${id}`,
+      noIndex: true,
+      siteName: brand.agencyName,
+    });
+  }
+
+  const sectorMeta =
+    SECTOR_CATALOG[pkg.category ?? 'TOUR'] ?? SECTOR_CATALOG.TOUR;
+  const summary =
+    pkg.description.replace(/\s+/g, ' ').trim().slice(0, 155) ||
+    `${pkg.title} — ${pkg.durationDays} Days in ${pkg.destination} by ${brand.agencyName}.`;
+
+  return buildPageMetadata({
+    title: `${pkg.title} (${pkg.destination})`,
+    description: summary,
+    path: `/packages/${pkg.id}`,
+    ogImage: '/images/packages-hero-bg.jpg',
+    siteName: brand.agencyName,
+    keywords: [
+      pkg.title,
+      pkg.destination,
+      sectorMeta.label,
+      brand.agencyName,
+      `${pkg.destination} tour package`,
+    ],
+  });
+}
+
 export default async function PublicPackageDetailsPage({
   params,
 }: {
@@ -18,7 +71,7 @@ export default async function PublicPackageDetailsPage({
 }) {
   const { id } = await params;
   const [pkg, brand] = await Promise.all([
-    getSinglePackage(id),
+    getCachedPackage(id),
     getLiveBrandInfo(),
   ]);
 
@@ -35,6 +88,14 @@ export default async function PublicPackageDetailsPage({
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
+      <JsonLd data={buildPackageJsonLd(pkg, brand)} />
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: 'Home', path: '/' },
+          { name: 'Packages', path: '/packages' },
+          { name: pkg.title, path: `/packages/${pkg.id}` },
+        ])}
+      />
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         <Link
           href={

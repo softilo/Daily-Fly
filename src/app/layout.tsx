@@ -1,6 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, Playfair_Display, Geist_Mono } from 'next/font/google';
 import { brandConfig } from '@/config/brand.config';
+import { getSiteUrl } from '@/lib/seo';
 import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -22,13 +23,40 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+export const viewport: Viewport = {
+  themeColor: brandConfig.theme.primaryHex,
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: brandConfig.seo.defaultTitle,
     template: brandConfig.seo.titleTemplate,
   },
   description: brandConfig.seo.description,
   keywords: brandConfig.seo.keywords,
+  applicationName: brandConfig.agencyName,
+  authors: [{ name: brandConfig.agencyName }],
+  creator: brandConfig.agencyName,
+  publisher: brandConfig.agencyName,
+  category: 'Travel & Tourism',
+  formatDetection: {
+    telephone: true,
+    email: true,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   icons: {
     icon: '/favicon.ico',
     apple: '/favicon.ico',
@@ -37,6 +65,7 @@ export const metadata: Metadata = {
     title: brandConfig.seo.defaultTitle,
     description: brandConfig.seo.description,
     siteName: brandConfig.agencyName,
+    locale: 'en_BD',
     images: [
       {
         url: '/logo.png',
@@ -46,6 +75,12 @@ export const metadata: Metadata = {
       },
     ],
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: brandConfig.seo.defaultTitle,
+    description: brandConfig.seo.description,
+    images: ['/logo.png'],
   },
 };
 

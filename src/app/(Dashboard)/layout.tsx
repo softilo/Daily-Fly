@@ -4,6 +4,7 @@ import {
   requireStaffSession,
 } from '@/services/auth/getMe';
 import { getLiveBrandInfo } from '@/services/settings/settings.service';
+import { NO_INDEX_ROBOTS } from '@/lib/seo';
 import { BrandProvider } from '@/components/providers/BrandProvider';
 import { SessionSecurityGuard } from '@/components/providers/SessionSecurityGuard';
 import { DashboardSidebar } from '@/components/module/dashboard/DashboardSidebar';
@@ -18,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
       default: `CRM Workspace | ${brand.agencyName}`,
       template: `%s | ${brand.agencyName}`,
     },
+    robots: NO_INDEX_ROBOTS,
   };
 }
 
