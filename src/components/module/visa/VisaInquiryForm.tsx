@@ -44,14 +44,13 @@ export default function VisaInquiryForm({
 
   if (!isAccepting) {
     return (
-      <div className="rounded-2xl border border-orange-200 bg-orange-50 p-6">
-        <h3 className="text-base font-bold text-orange-900">
+      <div className="rounded-2xl border border-[#F7D29E] bg-[#FEF3E2] p-6">
+        <h3 className="text-base font-bold text-[#BF6F1E]">
           Inquiries Currently Paused for This Service
         </h3>
-        <p className="mt-2 text-sm text-orange-800">
+        <p className="mt-2 text-sm text-[#BF6F1E]">
           Our agency is currently not accepting new consultation requests for{' '}
-          <strong>{serviceTitle}</strong> ({countryName}). Please check back later or browse our
-          other active destination services.
+          <strong>{serviceTitle}</strong> ({countryName}). Please check back later or browse our other active destination services.
         </p>
       </div>
     );
@@ -93,23 +92,23 @@ export default function VisaInquiryForm({
 
   if (submittedResult) {
     return (
-      <div className="rounded-2xl border border-teal-200 bg-teal-50/60 p-6 space-y-4">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-3 py-1 text-xs font-bold text-teal-900">
-          <CheckCircle2 className="h-3.5 w-3.5 text-teal-700" />
+      <div className="space-y-4 rounded-2xl border border-[#0A3A23]/20 bg-[#edf7f1] p-6">
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-bold text-[#0A3A23] shadow-2xs">
+          <CheckCircle2 className="h-3.5 w-3.5 text-[#D9822B]" />
           Consultation Request Registered
         </div>
-        <h3 className="text-lg font-bold text-slate-900">
+        <h3 className="text-lg font-bold text-[#0A3A23]">
           Thank you! Your Visa File Has Been Created
         </h3>
-        <p className="text-sm text-teal-900">{submittedResult.message}</p>
+        <p className="text-sm text-[#062416]">{submittedResult.message}</p>
         {submittedResult.trackingCode && (
-          <div className="rounded-xl border border-teal-200 bg-white p-4 space-y-3">
+          <div className="space-y-3 rounded-xl border border-[#0A3A23]/20 bg-white p-4">
             <div className="flex items-center justify-between gap-2">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
                   Your File Tracking Code
                 </p>
-                <p className="mt-0.5 font-mono text-xl font-extrabold text-slate-900">
+                <p className="mt-0.5 font-mono text-xl font-extrabold text-[#0A3A23]">
                   #{submittedResult.trackingCode}
                 </p>
               </div>
@@ -122,11 +121,11 @@ export default function VisaInquiryForm({
                     setTimeout(() => setCopiedCode(false), 2500);
                   }
                 }}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-[#FAF9F6] px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-stone-100"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-[#F9FAFB] px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
               >
                 {copiedCode ? (
                   <>
-                    <Check className="h-3.5 w-3.5 text-teal-700" />
+                    <Check className="h-3.5 w-3.5 text-[#0A3A23]" />
                     Copied
                   </>
                 ) : (
@@ -137,12 +136,12 @@ export default function VisaInquiryForm({
                 )}
               </button>
             </div>
-            <p className="text-xs text-stone-600">
+            <p className="text-xs text-gray-600">
               Use this Tracking Code anytime to check document verification and visa processing milestones.
             </p>
             <Link
               href={`/track-status?code=${submittedResult.trackingCode}`}
-              className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-teal-700 px-4 py-2.5 text-xs font-bold text-white hover:bg-teal-800 transition"
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#D9822B] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#BF6F1E]"
             >
               <Search className="h-3.5 w-3.5" />
               Track My File Status Now →
@@ -156,13 +155,14 @@ export default function VisaInquiryForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 rounded-2xl border border-stone-200/90 bg-white p-6 shadow-2xs"
+      className="space-y-4 rounded-2xl border border-gray-200/80 bg-white p-6 shadow-md"
     >
       <div>
-        <h3 className="text-lg font-bold text-slate-900">Request a Visa Consultation</h3>
-        <p className="mt-1 text-xs text-stone-600">
-          Inquiring about <strong>{serviceTitle}</strong> for <strong>{countryName}</strong>. An
-          authorized visa consultant will review your inquiry and contact you.
+        <h3 className="text-lg font-bold text-[#0A3A23]">
+          Request a Visa Consultation
+        </h3>
+        <p className="mt-1 text-xs text-gray-600">
+          Inquiring about <strong>{serviceTitle}</strong> for <strong>{countryName}</strong>. An authorized visa consultant will review your inquiry and contact you.
         </p>
       </div>
 
@@ -173,7 +173,7 @@ export default function VisaInquiryForm({
       )}
 
       <div>
-        <label className="mb-1 block text-xs font-semibold text-slate-700">
+        <label className="mb-1 block text-xs font-bold text-gray-700">
           Full Name <span className="text-rose-500">*</span>
         </label>
         <input
@@ -183,13 +183,13 @@ export default function VisaInquiryForm({
           value={formData.fullName}
           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
           placeholder="Your full name as on passport"
-          className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/15"
+          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-[#0A3A23] focus:ring-2 focus:ring-[#0A3A23]/15 focus:outline-none"
         />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-xs font-semibold text-slate-700">
+          <label className="mb-1 block text-xs font-bold text-gray-700">
             Phone / WhatsApp <span className="text-rose-500">*</span>
           </label>
           <input
@@ -199,24 +199,26 @@ export default function VisaInquiryForm({
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             placeholder="+8801XXXXXXXXX"
-            className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/15"
+            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-[#0A3A23] focus:ring-2 focus:ring-[#0A3A23]/15 focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-semibold text-slate-700">Email Address</label>
+          <label className="mb-1 block text-xs font-bold text-gray-700">
+            Email Address
+          </label>
           <input
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             placeholder="you@example.com"
-            className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/15"
+            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-[#0A3A23] focus:ring-2 focus:ring-[#0A3A23]/15 focus:outline-none"
           />
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-semibold text-slate-700">
+        <label className="mb-1 block text-xs font-bold text-gray-700">
           Inquiry Note / Background Summary
         </label>
         <textarea
@@ -224,30 +226,28 @@ export default function VisaInquiryForm({
           maxLength={2000}
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          placeholder="Briefly mention your intended travel timeline, qualification/work background, or questions (do not enter passport or NID numbers here)..."
-          className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/15"
+          placeholder="Briefly mention your intended travel timeline, qualification/work background, or questions..."
+          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-[#0A3A23] focus:ring-2 focus:ring-[#0A3A23]/15 focus:outline-none"
         />
       </div>
 
-      <label className="flex items-start gap-2.5 text-xs text-stone-600">
+      <label className="flex items-start gap-2.5 text-xs text-gray-600">
         <input
           type="checkbox"
           required
           checked={formData.consentGiven}
           onChange={(e) => setFormData({ ...formData, consentGiven: e.target.checked })}
-          className="mt-0.5 h-4 w-4 rounded border-stone-300 text-teal-700 focus:ring-teal-700"
+          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#0A3A23] focus:ring-[#0A3A23]"
         />
         <span>
-          I understand that this agency provides visa consultancy and documentation assistance only,
-          that final visa decisions rest solely with the relevant embassy/government authority, and
-          I consent to being contacted regarding my inquiry.
+          I understand that this agency provides visa consultancy and documentation assistance only, that final visa decisions rest solely with the relevant embassy/government authority, and I consent to being contacted regarding my inquiry.
         </span>
       </label>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-800 disabled:opacity-50"
+        className="w-full rounded-xl bg-[#D9822B] px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#BF6F1E] disabled:opacity-50"
       >
         {loading ? 'Submitting Inquiry...' : 'Submit Consultation Request'}
       </button>

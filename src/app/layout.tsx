@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google';
 import { brandConfig } from '@/config/brand.config';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const jakarta = Plus_Jakarta_Sans({
+  variable: '--font-jakarta',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
 });
 
 const geistMono = Geist_Mono({
@@ -20,6 +22,24 @@ export const metadata: Metadata = {
   },
   description: brandConfig.seo.description,
   keywords: brandConfig.seo.keywords,
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
+  openGraph: {
+    title: brandConfig.seo.defaultTitle,
+    description: brandConfig.seo.description,
+    siteName: brandConfig.agencyName,
+    images: [
+      {
+        url: '/logo.png',
+        width: 800,
+        height: 800,
+        alt: `${brandConfig.agencyName} Logo`,
+      },
+    ],
+    type: 'website',
+  },
 };
 
 export default function RootLayout({
@@ -30,9 +50,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${jakarta.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#FAF9F6] text-slate-900">
+      <body className="min-h-full flex flex-col bg-[#F9FAFB] text-[#1F2937] font-sans">
         {children}
       </body>
     </html>

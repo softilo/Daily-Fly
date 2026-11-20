@@ -31,15 +31,15 @@ export function LoginForm() {
   }, [state, router]);
 
   return (
-    <Card className="w-full max-w-md shadow-lg border-stone-200/90">
-      <CardHeader className="border-b border-stone-100 pb-4">
-        <span className="inline-flex w-fit items-center rounded-full bg-teal-50 border border-teal-200 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-teal-800">
+    <Card className="w-full max-w-md border-gray-200/80 shadow-xl">
+      <CardHeader className="border-b border-gray-100 pb-4">
+        <span className="inline-flex w-fit items-center rounded-full border border-[#0A3A23]/20 bg-[#edf7f1] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#0A3A23]">
           Operations CRM Desk
         </span>
-        <CardTitle className="mt-2 text-2xl font-extrabold text-slate-900">
+        <CardTitle className="mt-2 text-2xl font-extrabold text-[#0A3A23]">
           Staff Sign In — {brand.agencyName}
         </CardTitle>
-        <p className="text-xs text-stone-500">
+        <p className="text-xs text-gray-500">
           Authorized travel counselors and agency administrators only.
         </p>
       </CardHeader>
@@ -61,21 +61,21 @@ export function LoginForm() {
               id="email"
               name="email"
               type="email"
-              placeholder="counselor@agency.com"
+              placeholder="counselor@dailyflytravel.com"
               autoComplete="email"
               required
             />
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="mb-1.5 flex items-center justify-between">
               <Label htmlFor="password" className="mb-0">
                 Password
               </Label>
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="text-xs font-semibold text-teal-700 hover:underline"
+                className="text-xs font-semibold text-[#D9822B] hover:underline"
               >
                 {showPassword ? 'Hide password' : 'Show password'}
               </button>
@@ -92,7 +92,7 @@ export function LoginForm() {
 
           <Button
             type="submit"
-            variant="secondary"
+            variant="gold"
             className="w-full"
             disabled={isPending}
           >
@@ -100,11 +100,14 @@ export function LoginForm() {
           </Button>
         </form>
 
-        <div className="mt-5 pt-4 border-t border-stone-100 flex items-center justify-between text-xs">
-          <Link href="/" className="font-medium text-stone-600 hover:text-teal-700">
+        <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4 text-xs">
+          <Link href="/" className="font-medium text-gray-600 hover:text-[#0A3A23]">
             ← Back to Public Website
           </Link>
-          <Link href="/track-status" className="inline-flex items-center gap-1 font-semibold text-teal-700 hover:underline">
+          <Link
+            href="/track-status"
+            className="inline-flex items-center gap-1 font-bold text-[#0A3A23] hover:text-[#D9822B] hover:underline"
+          >
             <Search className="h-3.5 w-3.5" />
             Track a File
           </Link>

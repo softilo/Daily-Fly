@@ -8,7 +8,7 @@ export const Input = React.forwardRef<
   <input
     ref={ref}
     className={cn(
-      'flex h-10 w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder:text-stone-400 focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/15 disabled:cursor-not-allowed disabled:opacity-50',
+      'flex h-10 w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm text-[#1F2937] placeholder:text-gray-400 focus:border-[#0A3A23] focus:outline-none focus:ring-2 focus:ring-[#0A3A23]/15 disabled:cursor-not-allowed disabled:opacity-50',
       className,
     )}
     {...props}
@@ -23,7 +23,7 @@ export const Textarea = React.forwardRef<
   <textarea
     ref={ref}
     className={cn(
-      'flex min-h-[96px] w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-stone-400 focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/15 disabled:cursor-not-allowed disabled:opacity-50',
+      'flex min-h-[96px] w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-[#1F2937] placeholder:text-gray-400 focus:border-[#0A3A23] focus:outline-none focus:ring-2 focus:ring-[#0A3A23]/15 disabled:cursor-not-allowed disabled:opacity-50',
       className,
     )}
     {...props}
@@ -38,7 +38,7 @@ export function Label({
   return (
     <label
       className={cn(
-        'block text-sm font-medium text-slate-700 mb-1.5',
+        'block text-sm font-semibold text-gray-700 mb-1.5',
         className,
       )}
       {...props}

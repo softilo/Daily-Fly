@@ -21,11 +21,14 @@ export default async function AuthLayout({
 
   return (
     <BrandProvider brand={brand}>
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-100 px-4 py-12">
-        <div className="mb-8">
-          <Logo href="/" />
+      <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#F0F7F3] via-[#F9FAFB] to-white px-4 py-12">
+        <div className="pointer-events-none absolute top-0 right-0 h-80 w-80 rounded-full bg-[#0A3A23]/5 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-0 h-80 w-80 rounded-full bg-[#D9822B]/10 blur-3xl" />
+
+        <div className="relative z-10 mb-8">
+          <Logo href="/" size="lg" showTagline />
         </div>
-        {children}
+        <div className="relative z-10 flex w-full justify-center">{children}</div>
       </div>
     </BrandProvider>
   );

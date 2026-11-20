@@ -1,12 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
-import {
-  Globe,
-  Landmark,
-  Layers,
-  Palmtree,
-} from 'lucide-react';
+import { Globe, Landmark, Layers, Palmtree } from 'lucide-react';
 import { getPackages } from '@/services/packages/packages.service';
 import { PackagePreviewCard } from '@/components/common/PackagePreviewCard';
 import {
@@ -57,100 +52,108 @@ export default async function PublicPackagesPage({
   const packageSectors = PACKAGE_CATEGORIES.map((key) => SECTOR_CATALOG[key]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 space-y-8">
-      {/* Header & Search */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-            Tour & Hajj Packages
+    <div className="min-h-screen bg-[#F9FAFB]">
+      {/* Header Banner */}
+      <section className="relative overflow-hidden border-b border-[#062416] bg-gradient-to-br from-[#0A3A23] via-[#0e4b2e] to-[#062416] py-12 text-white">
+        <div className="pointer-events-none absolute top-0 right-0 h-72 w-72 rounded-full bg-[#D9822B]/15 blur-3xl" />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <span className="inline-flex items-center rounded-full border border-[#D9822B]/40 bg-[#D9822B]/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#F7D29E]">
+            Verified Packages &amp; Pilgrimage
+          </span>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Tour &amp; Hajj Packages
           </h1>
-          <p className="mt-1 text-sm text-stone-500">
-            Curated domestic & international holidays, plus Hajj & Umrah packages.
+          <p className="mt-2 max-w-2xl text-sm text-slate-200 sm:text-base">
+            Curated domestic &amp; international holidays, air ticket combos, plus VIP &amp; economy Hajj &amp; Umrah packages.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <div className="w-full sm:w-72">
-            <SearchFilter
-              paramName="search"
-              placeholder="Search Cox's Bazar, Dubai, Makkah..."
-            />
-          </div>
-          <ClearFiltersButton />
-        </div>
-      </div>
+      </section>
 
-      {/* Category Filter Tabs (Tour & Hajj only) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href="/packages"
-            className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition-all ${
-              !activeCategory
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'border border-stone-200 bg-white text-stone-700 hover:bg-stone-100'
-            }`}
-          >
-            <Layers className="h-3.5 w-3.5" />
-            All Tour & Hajj
-          </Link>
-          {packageSectors.map((sector) => {
-            const isSelected = activeCategory === sector.key;
-            const Icon = PACKAGE_ICONS[sector.key] || Palmtree;
-            return (
-              <Link
-                key={sector.key}
-                href={`/packages?category=${sector.key}`}
-                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition-all ${
-                  isSelected
-                    ? 'bg-teal-700 text-white shadow-xs'
-                    : 'border border-stone-200 bg-white text-stone-700 hover:bg-stone-100'
-                }`}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {sector.key === 'TOUR' ? 'Holiday Tours' : sector.label}
+      <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
+        {/* Search & Filter Card */}
+        <div className="space-y-4 rounded-2xl border border-gray-200/80 bg-white p-5 shadow-xs">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex-1">
+              <SearchFilter
+                paramName="search"
+                placeholder="Search Cox's Bazar, Dubai, Makkah..."
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <ClearFiltersButton />
+              <span className="text-xs font-medium text-gray-500">
+                Showing <strong className="text-[#0A3A23]">{filteredPackages.length}</strong> active package
+                {filteredPackages.length === 1 ? '' : 's'}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4">
+            <Link
+              href="/packages"
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition-all ${
+                !activeCategory
+                  ? 'bg-[#0A3A23] text-white shadow-xs'
+                  : 'border border-gray-200 bg-[#F9FAFB] text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <Layers className="h-3.5 w-3.5" />
+              All Tour &amp; Hajj
+            </Link>
+            {packageSectors.map((sector) => {
+              const isSelected = activeCategory === sector.key;
+              const Icon = PACKAGE_ICONS[sector.key] || Palmtree;
+              return (
+                <Link
+                  key={sector.key}
+                  href={`/packages?category=${sector.key}`}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition-all ${
+                    isSelected
+                      ? 'bg-[#D9822B] text-white shadow-xs'
+                      : 'border border-gray-200 bg-[#F9FAFB] text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {sector.key === 'TOUR' ? 'Holiday Tours' : sector.label}
+                </Link>
+              );
+            })}
+            <Link
+              href="/visa-services"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#0A3A23]/20 bg-[#edf7f1] px-4 py-2 text-xs font-bold text-[#0A3A23] transition hover:bg-[#0A3A23] hover:text-white"
+            >
+              <Globe className="h-3.5 w-3.5" />
+              Looking for Visa or Work Permits? →
+            </Link>
+          </div>
+        </div>
+
+        {filteredPackages.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredPackages.map((pkg) => (
+              <PackagePreviewCard key={pkg.id} pkg={pkg} />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-3 rounded-2xl border border-dashed border-[#0A3A23]/25 bg-white p-12 text-center">
+            <p className="text-lg font-bold text-[#0A3A23]">
+              No active packages matched your selection.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <Link href="/packages">
+                <Button variant="outline" size="sm">
+                  Reset Filters
+                </Button>
               </Link>
-            );
-          })}
-          <Link
-            href="/visa-services"
-            className="inline-flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50/70 px-4 py-2 text-xs font-semibold text-teal-800 hover:bg-teal-100 transition"
-          >
-            <Globe className="h-3.5 w-3.5" />
-            Looking for Visa or Work Permits? →
-          </Link>
-        </div>
-
-        <span className="text-xs font-medium text-stone-500">
-          Showing <strong>{filteredPackages.length}</strong> active package
-          {filteredPackages.length === 1 ? '' : 's'}
-        </span>
-      </div>
-
-      {filteredPackages.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredPackages.map((pkg) => (
-            <PackagePreviewCard key={pkg.id} pkg={pkg} />
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center space-y-3">
-          <p className="text-base font-semibold text-slate-800">
-            No active packages matched your selection.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Link href="/packages">
-              <Button variant="outline" size="sm">
-                Reset Filters
-              </Button>
-            </Link>
-            <Link href="/contact">
-              <Button variant="secondary" size="sm">
-                Request Custom Quote →
-              </Button>
-            </Link>
+              <Link href="/contact">
+                <Button variant="gold" size="sm">
+                  Request Custom Quote →
+                </Button>
+              </Link>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

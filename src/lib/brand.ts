@@ -4,6 +4,7 @@ import { AgencySettings } from '@/types/api';
 export interface LiveBrandInfo {
   agencyName: string;
   legalName: string;
+  tagline: string;
   email: string;
   phone: string;
   whatsapp: string;
@@ -16,6 +17,7 @@ export interface LiveBrandInfo {
   quotationValidityDays: number;
   logoPrimary: string;
   logoAccent: string;
+  logoSubtitle: string;
   initials: string;
 }
 
@@ -24,6 +26,7 @@ const IGNORED_INITIAL_WORDS = new Set(['the', 'and', 'of', 'for', '&', 'a', 'an'
 function deriveLogoParts(agencyName: string): {
   logoPrimary: string;
   logoAccent: string;
+  logoSubtitle: string;
   initials: string;
 } {
   const clean = agencyName.trim();
@@ -31,16 +34,29 @@ function deriveLogoParts(agencyName: string): {
     return {
       logoPrimary: brandConfig.logo.primaryText,
       logoAccent: brandConfig.logo.accentText,
-      initials: `${brandConfig.logo.primaryText.charAt(0)}${brandConfig.logo.accentText.charAt(0)}`.toUpperCase(),
+      logoSubtitle: 'Travel & Tours',
+      initials: 'DF',
     };
   }
 
-  // Keep exact brand split if using the default agency name
+  // Exact two-tone split for Daily Fly brand identity
+  if (clean.toLowerCase().startsWith('daily fly')) {
+    const rest = clean.slice('daily fly'.length).trim();
+    return {
+      logoPrimary: 'Daily ',
+      logoAccent: 'Fly',
+      logoSubtitle: rest || 'Travel & Tours',
+      initials: 'DF',
+    };
+  }
+
+  // Keep exact brand split if using TravelPilot fallback
   if (clean.toLowerCase().startsWith('travelpilot')) {
     const rest = clean.slice('travelpilot'.length).trim();
     return {
       logoPrimary: 'Travel',
       logoAccent: rest ? `Pilot ${rest}` : 'Pilot',
+      logoSubtitle: '',
       initials: 'TP',
     };
   }
@@ -59,6 +75,7 @@ function deriveLogoParts(agencyName: string): {
     return {
       logoPrimary: words[0],
       logoAccent: '',
+      logoSubtitle: '',
       initials,
     };
   }
@@ -67,6 +84,7 @@ function deriveLogoParts(agencyName: string): {
   return {
     logoPrimary: `${words.slice(0, splitAt).join(' ')} `,
     logoAccent: words.slice(splitAt).join(' '),
+    logoSubtitle: '',
     initials,
   };
 }
@@ -84,17 +102,19 @@ export function buildLiveBrandInfo(
   const whatsappDigits = phone.replace(/[^0-9]/g, '');
   const whatsapp =
     whatsappDigits.length >= 7
-      ? `+${whatsappDigits}`
+      ? `+${whatsappDigits.startsWith('88') ? whatsappDigits : `88${whatsappDigits}`}`
       : brandConfig.contact.whatsapp;
   const address = settings?.address?.trim() || brandConfig.contact.address;
   const defaultCurrency =
     settings?.defaultCurrency?.trim() || brandConfig.defaults.currency;
 
-  const { logoPrimary, logoAccent, initials } = deriveLogoParts(agencyName);
+  const { logoPrimary, logoAccent, logoSubtitle, initials } =
+    deriveLogoParts(agencyName);
 
   return {
     agencyName,
     legalName,
+    tagline: brandConfig.tagline,
     email,
     phone,
     whatsapp,
@@ -107,6 +127,7 @@ export function buildLiveBrandInfo(
     quotationValidityDays: Number(settings?.quotationValidityDays ?? 7),
     logoPrimary,
     logoAccent,
+    logoSubtitle,
     initials,
   };
 }

@@ -31,30 +31,30 @@ export interface SectorMetaConfig {
 export const SECTOR_CATALOG: Record<ServiceCategory, SectorMetaConfig> = {
   TOUR: {
     key: 'TOUR',
-    label: 'Holiday Tours & Visa',
+    label: 'Holiday Tours & Air Tickets',
     shortLabel: 'Holiday Tour',
-    badgeColor: 'bg-stone-100 text-stone-700 border-stone-200',
-    description: 'Domestic & international holiday packages, hotels, and tourist visas.',
+    badgeColor: 'bg-[#edf7f1] text-[#0A3A23] border-[#0A3A23]/20',
+    description: 'Domestic & international holiday packages, air tickets, hotels, and tourist visas.',
   },
   HAJJ_UMRAH: {
     key: 'HAJJ_UMRAH',
     label: 'Hajj & Umrah Packages',
     shortLabel: 'Hajj & Umrah',
-    badgeColor: 'bg-teal-50 text-teal-800 border-teal-200/80',
+    badgeColor: 'bg-[#0A3A23] text-white border-[#0A3A23]',
     description: 'Nusuk-verified Hajj & Umrah packages with walking-distance Haram hotels.',
   },
   WORK_PERMIT: {
     key: 'WORK_PERMIT',
-    label: 'Work Permit & Job Visa',
+    label: 'Europe & Global Work Permits',
     shortLabel: 'Work Permit',
-    badgeColor: 'bg-amber-50/80 text-amber-800 border-amber-200/80',
-    description: 'Verified overseas employment permits, GAMCA medical & BMET processing.',
+    badgeColor: 'bg-[#FEF3E2] text-[#BF6F1E] border-[#F7D29E]',
+    description: 'Verified overseas employment permits (Albania, Romania, Croatia & GCC) with BMET processing.',
   },
   STUDENT_VISA: {
     key: 'STUDENT_VISA',
     label: 'Study Abroad & Student Visa',
     shortLabel: 'Student Visa',
-    badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
+    badgeColor: 'bg-slate-100 text-slate-800 border-slate-200',
     description: 'University admission, SOP/CAS support, and student visa counseling.',
   },
 };
@@ -108,24 +108,24 @@ export interface BrandConfig {
 }
 
 export const brandConfig: BrandConfig = {
-  agencyName: 'TravelPilot Holidays',
-  shortName: 'TravelPilot',
-  tagline: 'Curated Journeys, Transparent Pricing, Memorable Experiences',
-  legalName: 'TravelPilot Tours & Travels Ltd.',
+  agencyName: 'Daily Fly Travel & Tours',
+  shortName: 'Daily Fly',
+  tagline: 'Explore the world with us',
+  legalName: 'Daily Fly Travel & Tours',
   establishedYear: 2026,
   enabledCategories: ['TOUR', 'HAJJ_UMRAH', 'WORK_PERMIT', 'STUDENT_VISA'],
   logo: {
-    primaryText: 'Travel',
-    accentText: 'Pilot',
-    imageUrl: undefined,
+    primaryText: 'Daily ',
+    accentText: 'Fly',
+    imageUrl: '/logo.png',
     faviconUrl: '/favicon.ico',
   },
   contact: {
-    phone: '+880 1700-000000',
-    whatsapp: '+8801700000000',
-    email: 'operations@travelpilot.internal',
-    address: 'House 42, Road 11, Banani, Dhaka-1213, Bangladesh',
-    officeHours: 'Saturday – Thursday: 10:00 AM – 8:00 PM',
+    phone: '01355-289399',
+    whatsapp: '+8801355289399',
+    email: 'dailyflytraveltours@gmail.com',
+    address: 'Feni Center, 5th floor, Lift (4), Post Office Road, Feni, Bangladesh, 3900',
+    officeHours: 'Saturday – Thursday: 9:30 AM – 8:00 PM',
   },
   socials: {
     facebook: 'https://facebook.com',
@@ -138,20 +138,22 @@ export const brandConfig: BrandConfig = {
     locale: 'en-BD',
   },
   theme: {
-    primaryHex: '#0f172a', // Slate 900
-    accentHex: '#0284c7',  // Sky 600
+    primaryHex: '#0A3A23', // Brand Forest Green
+    accentHex: '#D9822B',  // Brand Warm Gold
   },
   seo: {
-    titleTemplate: '%s | TravelPilot Holidays',
-    defaultTitle: 'TravelPilot Holidays — Tour Packages & Travel Operations',
+    titleTemplate: '%s | Daily Fly Travel & Tours',
+    defaultTitle: 'Daily Fly Travel & Tours | Explore The World With Us',
     description:
-      'Discover verified domestic and international tour packages with transparent inclusions and tailored travel planning.',
+      'Daily Fly Travel & Tours — Trusted agency for Air Ticket Booking, Visa Assistance, Europe Work Permits (Albania, Romania, Croatia), Student Visas, and sacred Hajj & Umrah packages. Located at Feni Center, Feni, Bangladesh.',
     keywords: [
-      'Bangladesh travel agency',
-      'tour packages Dhaka',
-      'Coxs Bazar tour',
-      'Sundarbans package',
-      'international holiday packages',
+      'Daily Fly Travel & Tours',
+      'Air Ticket Feni',
+      'Europe Work Permit Bangladesh',
+      'Albania Work Permit Visa',
+      'Hajj Umrah Agency Feni',
+      'Feni Travel Agency',
+      'Visa Assistance Bangladesh',
     ],
   },
 };

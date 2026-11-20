@@ -52,9 +52,9 @@ export function SearchFilter({
   }, [value, currentSearch, debounceMs, paramName, pathname, router, searchParams]);
 
   return (
-    <div className={`relative flex-1 min-w-[220px] ${className}`}>
+    <div className={`relative min-w-[220px] flex-1 ${className}`}>
       <svg
-        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
+        className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -68,18 +68,18 @@ export function SearchFilter({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="pl-9 pr-14 h-9.5 text-xs sm:text-sm"
+        className="h-9.5 pr-14 pl-9 text-xs sm:text-sm"
       />
-      <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+      <div className="absolute top-1/2 right-2.5 flex -translate-y-1/2 items-center gap-1.5">
         {isPending && (
-          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-teal-700 border-t-transparent" />
+          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#0A3A23] border-t-transparent" />
         )}
         {value && (
           <button
             type="button"
             onClick={() => setValue('')}
             aria-label="Clear search"
-            className="rounded-full bg-stone-100 px-1.5 py-0.5 text-[11px] font-bold text-stone-500 hover:bg-stone-200 hover:text-slate-800"
+            className="rounded-full bg-gray-100 px-1.5 py-0.5 text-[11px] font-bold text-gray-500 hover:bg-gray-200 hover:text-gray-800"
           >
             ×
           </button>

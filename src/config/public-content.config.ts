@@ -3,11 +3,11 @@ import { brandConfig } from './brand.config';
 export const publicContentConfig = {
   hero: {
     badge: `Trusted Travel Partner • ${brandConfig.agencyName}`,
-    title: 'Explore the World with Verified Tour Packages & Personal Care',
+    title: 'Explore the World With Us',
     subtitle:
-      'Whether you are planning a family holiday to Cox’s Bazar, a tea-garden retreat in Sylhet, or an international getaway, our travel specialists craft transparent quotations tailored to your budget.',
+      'Whether you are planning a family holiday, Hajj & Umrah journey, study abroad application, or overseas work permit, our travel specialists craft transparent quotations tailored to your goals.',
     primaryCta: {
-      label: 'Browse Tour Packages',
+      label: 'Explore All Packages',
       href: '/packages',
     },
     secondaryCta: {

@@ -47,7 +47,7 @@ export function SelectFilter({
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       {label && (
-        <span className="text-xs font-medium text-slate-500 whitespace-nowrap">
+        <span className="whitespace-nowrap text-xs font-medium text-gray-500">
           {label}
         </span>
       )}
@@ -55,10 +55,10 @@ export function SelectFilter({
         value={currentValue}
         disabled={isPending}
         onChange={(e) => handleChange(e.target.value)}
-        className={`h-9.5 rounded-xl border px-3 py-1.5 text-xs sm:text-sm transition focus:border-teal-700 focus:outline-none ${
+        className={`h-9.5 rounded-xl border px-3 py-1.5 text-xs transition focus:border-[#0A3A23] focus:outline-none sm:text-sm ${
           currentValue
-            ? 'border-teal-600 bg-teal-50/70 font-semibold text-teal-900'
-            : 'border-stone-300 bg-white text-slate-700'
+            ? 'border-[#0A3A23] bg-[#edf7f1] font-semibold text-[#0A3A23]'
+            : 'border-gray-200 bg-white text-gray-700'
         }`}
       >
         <option value="">{placeholder}</option>

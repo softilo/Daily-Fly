@@ -9,7 +9,6 @@ import {
 import VisaInquiryForm from '@/components/module/visa/VisaInquiryForm';
 import { VisaServiceRequirement } from '@/types/api';
 
-
 export const instant = false;
 
 export default async function VisaServiceDetailPage({
@@ -29,31 +28,31 @@ export default async function VisaServiceDetailPage({
   const steps = service.applicationProcessSteps || [];
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] py-10">
+    <div className="min-h-screen bg-[#F9FAFB] py-10">
       <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-stone-500">
-          <Link href="/visa-services" className="hover:text-teal-700">
-            Visa & Immigration
+        <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-500">
+          <Link href="/visa-services" className="hover:text-[#0A3A23]">
+            Visa &amp; Immigration
           </Link>
           <span>/</span>
-          <Link href={`/visa-services/${country.slug}`} className="hover:text-teal-700">
+          <Link href={`/visa-services/${country.slug}`} className="hover:text-[#0A3A23]">
             {country.name}
           </Link>
           <span>/</span>
-          <span className="text-slate-800">{service.title}</span>
+          <span className="text-[#0A3A23]">{service.title}</span>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-12">
-          {/* Left Column: Detailed Service Information */}
+          {/* Left Column */}
           <div className="space-y-6 lg:col-span-7">
-            <div className="rounded-2xl border border-stone-200/90 bg-white p-6 shadow-2xs sm:p-8">
+            <div className="rounded-2xl border border-gray-200/80 bg-white p-6 shadow-xs sm:p-8">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="inline-flex h-7 items-center rounded-lg border border-stone-200 bg-[#FAF9F6] px-2 font-mono text-xs font-bold text-stone-700">
+                  <span className="inline-flex h-7 items-center rounded-lg border border-[#0A3A23]/15 bg-[#edf7f1] px-2 font-mono text-xs font-bold text-[#0A3A23]">
                     {country.isoCode || country.name.slice(0, 2)}
                   </span>
-                  <span className="text-sm font-bold text-slate-700">{country.name}</span>
+                  <span className="text-sm font-bold text-gray-800">{country.name}</span>
                   <VisaCategoryBadge
                     category={service.category}
                     customLabel={service.customCategoryLabel}
@@ -62,30 +61,30 @@ export default async function VisaServiceDetailPage({
                 <AgencyServiceStatusBadge status={service.serviceStatus} />
               </div>
 
-              <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+              <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-[#0A3A23] sm:text-3xl">
                 {service.title}
               </h1>
-              <p className="mt-2 text-base text-stone-600">{service.shortDescription}</p>
+              <p className="mt-2 text-base text-gray-600">{service.shortDescription}</p>
 
-              {/* Key Service Metrics */}
-              <div className="mt-6 grid gap-4 rounded-xl border border-stone-200/70 bg-[#FAF9F6] p-4 sm:grid-cols-3">
+              {/* Key Metrics */}
+              <div className="mt-6 grid gap-4 rounded-xl border border-gray-100 bg-[#F9FAFB] p-4 sm:grid-cols-3">
                 <div>
-                  <span className="text-xs text-stone-500">Indicative Processing Time</span>
-                  <p className="mt-1 text-sm font-bold text-slate-900">
+                  <span className="text-xs text-gray-500">Indicative Processing Time</span>
+                  <p className="mt-1 text-sm font-bold text-[#0A3A23]">
                     {service.estimatedProcessingTime || 'Varies by Embassy'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-xs text-stone-500">Agency Consultancy Fee</span>
-                  <p className="mt-1 text-sm font-bold text-slate-900 tabular-nums">
+                  <span className="text-xs text-gray-500">Agency Consultancy Fee</span>
+                  <p className="mt-1 text-sm font-bold text-[#0A3A23] tabular-nums">
                     {service.agencyServiceFee
                       ? `${service.currency} ${Number(service.agencyServiceFee).toLocaleString()}`
                       : 'Contact for Assessment'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-xs text-stone-500">Embassy / Government Fees</span>
-                  <p className="mt-1 text-xs font-medium text-stone-700">
+                  <span className="text-xs text-gray-500">Embassy / Government Fees</span>
+                  <p className="mt-1 text-xs font-medium text-gray-700">
                     {service.governmentFeeInfo || 'Applicable official embassy fees paid separately'}
                   </p>
                 </div>
@@ -93,17 +92,21 @@ export default async function VisaServiceDetailPage({
 
               {service.fullDescription && (
                 <div className="mt-6">
-                  <h2 className="text-base font-bold text-slate-900">Service Scope & Overview</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-stone-700 whitespace-pre-line">
+                  <h2 className="text-base font-bold text-[#0A3A23]">
+                    Service Scope &amp; Overview
+                  </h2>
+                  <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-gray-700">
                     {service.fullDescription}
                   </p>
                 </div>
               )}
 
               {service.eligibilityInfo && (
-                <div className="mt-6 rounded-xl border border-teal-200 bg-teal-50/60 p-4">
-                  <h2 className="text-sm font-bold text-teal-950">General Eligibility Guidance</h2>
-                  <p className="mt-1.5 text-sm text-teal-900 whitespace-pre-line">
+                <div className="mt-6 rounded-xl border border-[#0A3A23]/15 bg-[#edf7f1] p-4">
+                  <h2 className="text-sm font-bold text-[#0A3A23]">
+                    General Eligibility Guidance
+                  </h2>
+                  <p className="mt-1.5 whitespace-pre-line text-sm text-[#062416]">
                     {service.eligibilityInfo}
                   </p>
                 </div>
@@ -111,34 +114,34 @@ export default async function VisaServiceDetailPage({
             </div>
 
             {/* Required Documents Checklist */}
-            <div className="rounded-2xl border border-stone-200/90 bg-white p-6 shadow-2xs sm:p-8">
-              <h2 className="text-lg font-bold text-slate-900">
+            <div className="rounded-2xl border border-gray-200/80 bg-white p-6 shadow-xs sm:p-8">
+              <h2 className="text-lg font-bold text-[#0A3A23]">
                 Required Documents Checklist ({requirements.length})
               </h2>
-              <p className="mt-1 text-xs text-stone-500">
-                Prepare the following documents for initial review. Do not upload sensitive passport
-                scans through public forms; our consultant will guide you during verification.
+              <p className="mt-1 text-xs text-gray-500">
+                Prepare the following documents for initial review. Do not upload sensitive passport scans through public forms; our consultant will guide you during verification.
               </p>
 
               {requirements.length === 0 ? (
-                <p className="mt-4 text-sm text-stone-600">
+                <p className="mt-4 text-sm text-gray-600">
                   Document checklist is customized based on applicant profile during consultation.
                 </p>
               ) : (
-                <ul className="mt-4 divide-y divide-stone-100">
+                <ul className="mt-4 divide-y divide-gray-100">
                   {requirements.map((req: VisaServiceRequirement) => (
                     <li key={req.id} className="flex items-start justify-between gap-4 py-3.5">
                       <div>
-                        <p className="text-sm font-semibold text-slate-800">{req.title}</p>
+                        <p className="text-sm font-semibold text-gray-800">{req.title}</p>
                         {req.description && (
-                          <p className="mt-0.5 text-xs text-stone-600">{req.description}</p>
+                          <p className="mt-0.5 text-xs text-gray-600">{req.description}</p>
                         )}
                       </div>
                       <span
-                        className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${req.isMandatory
-                            ? 'bg-slate-900 text-white'
-                            : 'bg-stone-100 text-stone-600'
-                          }`}
+                        className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+                          req.isMandatory
+                            ? 'bg-[#0A3A23] text-white'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
                       >
                         {req.isMandatory ? 'Mandatory' : 'Supporting'}
                       </span>
@@ -150,31 +153,31 @@ export default async function VisaServiceDetailPage({
 
             {/* Step-by-Step Application Assistance */}
             {steps.length > 0 && (
-              <div className="rounded-2xl border border-stone-200/90 bg-white p-6 shadow-2xs sm:p-8">
-                <h2 className="text-lg font-bold text-slate-900">
+              <div className="rounded-2xl border border-gray-200/80 bg-white p-6 shadow-xs sm:p-8">
+                <h2 className="text-lg font-bold text-[#0A3A23]">
                   How Our Application Assistance Works
                 </h2>
                 <ol className="mt-4 space-y-3">
                   {steps.map((step: string, index: number) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-700 text-xs font-bold text-white">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#D9822B] text-xs font-bold text-white">
                         {index + 1}
                       </span>
-                      <span className="pt-0.5 text-sm text-stone-700">{step}</span>
+                      <span className="pt-0.5 text-sm text-gray-700">{step}</span>
                     </li>
                   ))}
                 </ol>
               </div>
             )}
 
-            {/* Compliance Disclaimer & Verification Metadata */}
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-xs text-amber-900 space-y-2">
-              <p className="font-bold">Mandatory Immigration & Compliance Disclaimer</p>
+            {/* Compliance Disclaimer */}
+            <div className="space-y-2 rounded-2xl border border-[#F7D29E] bg-[#FEF3E2] p-5 text-xs text-[#BF6F1E]">
+              <p className="font-bold">Mandatory Immigration &amp; Compliance Disclaimer</p>
               <p>
                 {service.disclaimer ||
                   'Our agency provides visa application consultancy, document review, and appointment guidance only. Visa issuance, processing times, and work/study permit approvals are determined solely by the relevant embassy or immigration authority. No visa is ever guaranteed.'}
               </p>
-              <div className="flex flex-wrap items-center gap-4 pt-2 text-[11px] text-amber-800">
+              <div className="flex flex-wrap items-center gap-4 pt-2 text-[11px] text-[#BF6F1E]">
                 {service.lastVerifiedAt && (
                   <span>
                     Last Reviewed by Agency Staff:{' '}
@@ -195,7 +198,7 @@ export default async function VisaServiceDetailPage({
             </div>
           </div>
 
-          {/* Right Column: Sticky Consultation Inquiry Form */}
+          {/* Right Column: Sticky Consultation Form */}
           <div className="lg:col-span-5">
             <div className="sticky top-24 space-y-6">
               <VisaInquiryForm

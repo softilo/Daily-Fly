@@ -34,7 +34,6 @@ function ContactFormContent() {
   const [budget, setBudget] = useState('');
   const [requirements, setRequirements] = useState('');
 
-  // Sector-specific assessment fields
   const [age, setAge] = useState('');
   const [passportValidityMonths, setPassportValidityMonths] = useState('18');
   const [jobRole, setJobRole] = useState('');
@@ -107,386 +106,391 @@ function ContactFormContent() {
   const cleanWhatsapp = brand.whatsapp.replace(/[^0-9]/g, '');
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <span className="inline-block rounded-full border border-teal-200 bg-teal-50 px-3 py-0.5 text-xs font-bold text-teal-800">
-          Free • Instant Tracking ID
-        </span>
-        <h1 className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-          Eligibility Check & Inquiry
-        </h1>
-      </div>
-
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          {result ? (
-            <Card className="p-6 sm:p-8 border-teal-300 bg-teal-50/40 space-y-5">
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-teal-200 pb-4">
-                <div>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase text-teal-800">
-                    <CheckCircle2 className="h-4 w-4 text-teal-700" />
-                    Inquiry Recorded
-                  </span>
-                  <div className="mt-1 flex flex-wrap items-center gap-2.5">
-                    <h2 className="text-2xl font-extrabold text-slate-900 font-mono">
-                      #{result.trackingCode}
-                    </h2>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (typeof window !== 'undefined') {
-                          void navigator.clipboard.writeText(result.trackingCode);
-                          setCopiedCode(true);
-                          setTimeout(() => setCopiedCode(false), 2500);
-                        }
-                      }}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-teal-300 bg-white px-2.5 py-1 text-xs font-semibold text-teal-900 hover:bg-teal-50"
-                    >
-                      {copiedCode ? (
-                        <>
-                          <Check className="h-3.5 w-3.5 text-teal-700" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3.5 w-3.5" />
-                          Copy Code
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-                <span className="rounded-full bg-teal-700 px-4 py-1.5 text-xs font-bold text-white">
-                  Match Score: {result.eligibility?.score ?? 70}% (
-                  {String(result.eligibility?.status || 'CONDITIONAL_MATCH').replace(/_/g, ' ')})
-                </span>
-              </div>
-
-              <div className="rounded-xl bg-white p-4 border border-teal-200 space-y-2">
-                <p className="text-sm font-bold text-slate-900">
-                  {result.eligibility?.summary}
-                </p>
-                <ul className="space-y-1 text-xs text-stone-600">
-                  {(result.eligibility?.reasons || []).map((r, i) => (
-                    <li key={i}>• {r}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3 pt-1">
-                <Link href={`/track-status?code=${result.trackingCode}`}>
-                  <Button variant="secondary" className="gap-1.5">
-                    <Search className="h-3.5 w-3.5" />
-                    Track My File ({result.trackingCode}) →
-                  </Button>
-                </Link>
-                <Button
-                  variant="outline"
-                  onClick={() => setResult(null)}
-                >
-                  New Inquiry
-                </Button>
-              </div>
-            </Card>
-          ) : (
-            <Card className="p-6 sm:p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Step 1: Choose Sector */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">
-                    1. Select Service Category
-                  </label>
-                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-                    {enabledSectors.map((s) => (
-                      <button
-                        key={s.key}
-                        type="button"
-                        onClick={() => setCategory(s.key)}
-                        className={`rounded-xl border p-3 text-left transition-all ${
-                          category === s.key
-                            ? 'border-teal-700 bg-teal-50/70 text-teal-950 ring-2 ring-teal-700/15'
-                            : 'border-stone-200 bg-white text-slate-700 hover:bg-[#FAF9F6]'
-                        }`}
-                      >
-                        <p className="text-xs font-bold">{s.shortLabel}</p>
-                        <p className="mt-0.5 text-[11px] text-stone-500 line-clamp-1">
-                          {s.label}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Step 2: Basic Contact Info */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Full Name *
-                    </label>
-                    <Input
-                      required
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="e.g. Md. Rakibul Islam"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Phone / WhatsApp Number *
-                    </label>
-                    <Input
-                      required
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="e.g. +8801711223344"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Preferred Country / Destination
-                    </label>
-                    <Input
-                      value={destination}
-                      onChange={(e) => setDestination(e.target.value)}
-                      placeholder={
-                        category === 'HAJJ_UMRAH'
-                          ? 'Makkah & Madinah'
-                          : category === 'WORK_PERMIT'
-                            ? 'Romania / Saudi Arabia / Malaysia'
-                            : category === 'STUDENT_VISA'
-                              ? 'UK / Malaysia / Canada / Australia'
-                              : 'Cox’s Bazar / Maldives / Thailand'
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Estimated Budget ({brand.defaultCurrency})
-                    </label>
-                    <Input
-                      type="number"
-                      value={budget}
-                      onChange={(e) => setBudget(e.target.value)}
-                      placeholder="e.g. 450000"
-                    />
-                  </div>
-                </div>
-
-                {/* Step 3: Dynamic Sector-Specific Eligibility Inputs */}
-                {category === 'WORK_PERMIT' && (
-                  <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 space-y-4">
-                    <p className="text-xs font-bold uppercase text-slate-800">
-                      Work Permit Pre-Eligibility Check
-                    </p>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                      <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                          Applicant Age (Years)
-                        </label>
-                        <Input
-                          type="number"
-                          value={age}
-                          onChange={(e) => setAge(e.target.value)}
-                          placeholder="e.g. 27"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                          Passport Validity (Months)
-                        </label>
-                        <Input
-                          type="number"
-                          value={passportValidityMonths}
-                          onChange={(e) =>
-                            setPassportValidityMonths(e.target.value)
-                          }
-                          placeholder="Min 12 months"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                          Trade / Job Category
-                        </label>
-                        <Input
-                          value={jobRole}
-                          onChange={(e) => setJobRole(e.target.value)}
-                          placeholder="Warehouse / Driving / Hospitality"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {category === 'STUDENT_VISA' && (
-                  <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 space-y-4">
-                    <p className="text-xs font-bold uppercase text-slate-800">
-                      Academic & IELTS Eligibility Profile
-                    </p>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                      <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                          Last GPA / CGPA
-                        </label>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={gpa}
-                          onChange={(e) => setGpa(e.target.value)}
-                          placeholder="e.g. 3.45"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                          IELTS / PTE Score (0 if MOI)
-                        </label>
-                        <Input
-                          type="number"
-                          step="0.5"
-                          value={ieltsScore}
-                          onChange={(e) => setIeltsScore(e.target.value)}
-                          placeholder="e.g. 6.0"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                          Study Gap (Years)
-                        </label>
-                        <Input
-                          type="number"
-                          value={studyGapYears}
-                          onChange={(e) => setStudyGapYears(e.target.value)}
-                          placeholder="e.g. 2"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {category === 'HAJJ_UMRAH' && (
-                  <div className="rounded-xl border border-stone-200 bg-[#FAF9F6] p-4 space-y-3">
-                    <p className="text-xs font-bold uppercase text-slate-800">
-                      Hajj & Umrah Pilgrim Readiness
-                    </p>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                          Passport Remaining Validity (Months)
-                        </label>
-                        <Input
-                          type="number"
-                          value={passportValidityMonths}
-                          onChange={(e) =>
-                            setPassportValidityMonths(e.target.value)
-                          }
-                          placeholder="Minimum 6 months required"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">
-                          Email (Optional)
-                        </label>
-                        <Input
-                          type="email"
-                          value={customerEmail}
-                          onChange={(e) => setCustomerEmail(e.target.value)}
-                          placeholder="pilgrim@example.com"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Additional Notes / Questions
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={requirements}
-                    onChange={(e) => setRequirements(e.target.value)}
-                    placeholder="Mention preferred intake, work experience, room sharing preference, or number of family members..."
-                    className="w-full rounded-xl border border-stone-300 px-3 py-2 text-sm focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/15"
-                  />
-                </div>
-
-                {error && (
-                  <p className="rounded-xl bg-rose-50 p-3 text-xs font-medium text-rose-700">
-                    {error}
-                  </p>
-                )}
-
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  disabled={isPending}
-                  className="w-full sm:w-auto"
-                >
-                  {isPending
-                    ? 'Evaluating Profile & Generating Tracking ID...'
-                    : 'Submit & Get Instant Eligibility + Tracking ID →'}
-                </Button>
-              </form>
-            </Card>
-          )}
+    <div className="min-h-screen bg-[#F9FAFB]">
+      <section className="border-b border-[#062416] bg-gradient-to-br from-[#0A3A23] via-[#0d482b] to-[#062416] py-10 text-white">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <span className="inline-block rounded-full border border-[#D9822B]/40 bg-[#D9822B]/20 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-[#F7D29E]">
+            Free • Instant Tracking ID
+          </span>
+          <h1 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-4xl">
+            Eligibility Check &amp; Inquiry
+          </h1>
+          <p className="mt-1.5 text-sm text-slate-200">
+            Get instant pre-assessment scoring and a personal Tracking Code for your file.
+          </p>
         </div>
+      </section>
 
-        {/* Contact & Live Tracker Sidebar */}
-        <div className="space-y-5">
-          <Card className="p-6 bg-slate-900 text-white border-slate-800">
-            <h3 className="text-sm font-bold uppercase text-teal-300">
-              Already Applied With Us?
-            </h3>
-            <p className="mt-2 text-xs text-slate-300 leading-relaxed">
-              Check your Passport, GAMCA Medical, Offer Letter, BMET Manpower, or Umrah Visa progress 24/7 using your Tracking Code.
-            </p>
-            <Link href="/track-status" className="mt-4 block">
-              <Button variant="secondary" size="sm" className="w-full gap-1.5">
-                <Search className="h-3.5 w-3.5" />
-                Track Application Status
-              </Button>
-            </Link>
-          </Card>
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            {result ? (
+              <Card className="space-y-5 border-[#0A3A23]/25 bg-[#edf7f1] p-6 sm:p-8">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#0A3A23]/15 pb-4">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase text-[#0A3A23]">
+                      <CheckCircle2 className="h-4 w-4 text-[#D9822B]" />
+                      Inquiry Recorded
+                    </span>
+                    <div className="mt-1 flex flex-wrap items-center gap-2.5">
+                      <h2 className="font-mono text-2xl font-extrabold text-[#0A3A23]">
+                        #{result.trackingCode}
+                      </h2>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (typeof window !== 'undefined') {
+                            void navigator.clipboard.writeText(result.trackingCode);
+                            setCopiedCode(true);
+                            setTimeout(() => setCopiedCode(false), 2500);
+                          }
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#0A3A23]/25 bg-white px-2.5 py-1 text-xs font-semibold text-[#0A3A23] hover:bg-[#F0F7F3]"
+                      >
+                        {copiedCode ? (
+                          <>
+                            <Check className="h-3.5 w-3.5 text-[#0A3A23]" />
+                            Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3.5 w-3.5" />
+                            Copy Code
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-[#D9822B] px-4 py-1.5 text-xs font-bold text-white">
+                    Match Score: {result.eligibility?.score ?? 70}% (
+                    {String(result.eligibility?.status || 'CONDITIONAL_MATCH').replace(
+                      /_/g,
+                      ' ',
+                    )}
+                    )
+                  </span>
+                </div>
 
-          <Card className="p-6 space-y-3">
-            <h3 className="text-sm font-bold uppercase text-teal-700">
-              Talk to a Counselor Directly
-            </h3>
-            <a
-              href={`tel:${brand.phone.replace(/\s+/g, '')}`}
-              className="inline-flex items-center gap-2 text-lg font-bold text-slate-900 hover:text-teal-700 transition"
-            >
-              <Phone className="h-4 w-4 text-teal-700" />
-              {brand.phone}
-            </a>
-            <a
-              href={`https://wa.me/${cleanWhatsapp}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-teal-700 px-3 py-2 text-xs font-semibold text-white hover:bg-teal-800 transition"
-            >
-              <MessageSquare className="h-3.5 w-3.5" />
-              Message on WhatsApp ↗
-            </a>
-            <p className="text-xs text-stone-500">
-              Office Hours: {brand.officeHours}
-            </p>
-          </Card>
+                <div className="space-y-2 rounded-xl border border-[#0A3A23]/15 bg-white p-4">
+                  <p className="text-sm font-bold text-[#0A3A23]">
+                    {result.eligibility?.summary}
+                  </p>
+                  <ul className="space-y-1 text-xs text-gray-600">
+                    {(result.eligibility?.reasons || []).map((r, i) => (
+                      <li key={i}>• {r}</li>
+                    ))}
+                  </ul>
+                </div>
 
-          <Card className="p-6">
-            <h3 className="text-sm font-bold uppercase text-teal-700">
-              Visit Our Head Office
-            </h3>
-            <p className="mt-2 text-sm font-medium text-slate-900">
-              {brand.address}
-            </p>
-            <a
-              href={`mailto:${brand.email}`}
-              className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-teal-700 hover:underline"
-            >
-              <Mail className="h-3.5 w-3.5" />
-              {brand.email}
-            </a>
-          </Card>
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  <Link href={`/track-status?code=${result.trackingCode}`}>
+                    <Button variant="secondary" className="gap-1.5">
+                      <Search className="h-3.5 w-3.5" />
+                      Track My File ({result.trackingCode}) →
+                    </Button>
+                  </Link>
+                  <Button variant="outline" onClick={() => setResult(null)}>
+                    New Inquiry
+                  </Button>
+                </div>
+              </Card>
+            ) : (
+              <Card className="p-6 shadow-md sm:p-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-500">
+                      1. Select Service Category
+                    </label>
+                    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                      {enabledSectors.map((s) => (
+                        <button
+                          key={s.key}
+                          type="button"
+                          onClick={() => setCategory(s.key)}
+                          className={`rounded-xl border p-3 text-left transition-all ${
+                            category === s.key
+                              ? 'border-[#0A3A23] bg-[#edf7f1] text-[#0A3A23] ring-2 ring-[#0A3A23]/15'
+                              : 'border-gray-200 bg-white text-gray-700 hover:bg-[#F9FAFB]'
+                          }`}
+                        >
+                          <p className="text-xs font-bold">{s.shortLabel}</p>
+                          <p className="mt-0.5 line-clamp-1 text-[11px] text-gray-500">
+                            {s.label}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-xs font-bold text-gray-700">
+                        Full Name *
+                      </label>
+                      <Input
+                        required
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="e.g. Md. Rakibul Islam"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-bold text-gray-700">
+                        Phone / WhatsApp Number *
+                      </label>
+                      <Input
+                        required
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        placeholder="e.g. +8801711223344"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-bold text-gray-700">
+                        Preferred Country / Destination
+                      </label>
+                      <Input
+                        value={destination}
+                        onChange={(e) => setDestination(e.target.value)}
+                        placeholder={
+                          category === 'HAJJ_UMRAH'
+                            ? 'Makkah & Madinah'
+                            : category === 'WORK_PERMIT'
+                              ? 'Romania / Saudi Arabia / Malaysia'
+                              : category === 'STUDENT_VISA'
+                                ? 'UK / Malaysia / Canada / Australia'
+                                : "Cox's Bazar / Maldives / Thailand"
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-bold text-gray-700">
+                        Estimated Budget ({brand.defaultCurrency})
+                      </label>
+                      <Input
+                        type="number"
+                        value={budget}
+                        onChange={(e) => setBudget(e.target.value)}
+                        placeholder="e.g. 450000"
+                      />
+                    </div>
+                  </div>
+
+                  {category === 'WORK_PERMIT' && (
+                    <div className="space-y-4 rounded-xl border border-gray-200 bg-[#F9FAFB] p-4">
+                      <p className="text-xs font-bold uppercase text-[#0A3A23]">
+                        Work Permit Pre-Eligibility Check
+                      </p>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-gray-700">
+                            Applicant Age (Years)
+                          </label>
+                          <Input
+                            type="number"
+                            value={age}
+                            onChange={(e) => setAge(e.target.value)}
+                            placeholder="e.g. 27"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-gray-700">
+                            Passport Validity (Months)
+                          </label>
+                          <Input
+                            type="number"
+                            value={passportValidityMonths}
+                            onChange={(e) =>
+                              setPassportValidityMonths(e.target.value)
+                            }
+                            placeholder="Min 12 months"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-gray-700">
+                            Trade / Job Category
+                          </label>
+                          <Input
+                            value={jobRole}
+                            onChange={(e) => setJobRole(e.target.value)}
+                            placeholder="Warehouse / Driving / Hospitality"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {category === 'STUDENT_VISA' && (
+                    <div className="space-y-4 rounded-xl border border-gray-200 bg-[#F9FAFB] p-4">
+                      <p className="text-xs font-bold uppercase text-[#0A3A23]">
+                        Academic &amp; IELTS Eligibility Profile
+                      </p>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-gray-700">
+                            Last GPA / CGPA
+                          </label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={gpa}
+                            onChange={(e) => setGpa(e.target.value)}
+                            placeholder="e.g. 3.45"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-gray-700">
+                            IELTS / PTE Score (0 if MOI)
+                          </label>
+                          <Input
+                            type="number"
+                            step="0.5"
+                            value={ieltsScore}
+                            onChange={(e) => setIeltsScore(e.target.value)}
+                            placeholder="e.g. 6.0"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-gray-700">
+                            Study Gap (Years)
+                          </label>
+                          <Input
+                            type="number"
+                            value={studyGapYears}
+                            onChange={(e) => setStudyGapYears(e.target.value)}
+                            placeholder="e.g. 2"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {category === 'HAJJ_UMRAH' && (
+                    <div className="space-y-3 rounded-xl border border-gray-200 bg-[#F9FAFB] p-4">
+                      <p className="text-xs font-bold uppercase text-[#0A3A23]">
+                        Hajj &amp; Umrah Pilgrim Readiness
+                      </p>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-gray-700">
+                            Passport Remaining Validity (Months)
+                          </label>
+                          <Input
+                            type="number"
+                            value={passportValidityMonths}
+                            onChange={(e) =>
+                              setPassportValidityMonths(e.target.value)
+                            }
+                            placeholder="Minimum 6 months required"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-gray-700">
+                            Email (Optional)
+                          </label>
+                          <Input
+                            type="email"
+                            value={customerEmail}
+                            onChange={(e) => setCustomerEmail(e.target.value)}
+                            placeholder="pilgrim@example.com"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-gray-700">
+                      Additional Notes / Questions
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={requirements}
+                      onChange={(e) => setRequirements(e.target.value)}
+                      placeholder="Mention preferred intake, work experience, room sharing preference, or number of family members..."
+                      className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-[#0A3A23] focus:ring-2 focus:ring-[#0A3A23]/15 focus:outline-none"
+                    />
+                  </div>
+
+                  {error && (
+                    <p className="rounded-xl bg-rose-50 p-3 text-xs font-medium text-rose-700">
+                      {error}
+                    </p>
+                  )}
+
+                  <Button
+                    type="submit"
+                    variant="gold"
+                    disabled={isPending}
+                    className="w-full sm:w-auto"
+                  >
+                    {isPending
+                      ? 'Evaluating Profile & Generating Tracking ID...'
+                      : 'Submit & Get Instant Eligibility + Tracking ID →'}
+                  </Button>
+                </form>
+              </Card>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-5">
+            <Card className="border-[#062416] bg-[#0A3A23] p-6 text-white">
+              <h3 className="text-sm font-bold uppercase text-[#F7D29E]">
+                Already Applied With Us?
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-slate-200">
+                Check your Passport, GAMCA Medical, Offer Letter, BMET Manpower, or Umrah Visa progress 24/7 using your Tracking Code.
+              </p>
+              <Link href="/track-status" className="mt-4 block">
+                <Button variant="gold" size="sm" className="w-full gap-1.5">
+                  <Search className="h-3.5 w-3.5" />
+                  Track Application Status
+                </Button>
+              </Link>
+            </Card>
+
+            <Card className="space-y-3 p-6">
+              <h3 className="text-sm font-bold uppercase text-[#0A3A23]">
+                Talk to a Counselor Directly
+              </h3>
+              <a
+                href={`tel:${brand.phone.replace(/\s+/g, '')}`}
+                className="inline-flex items-center gap-2 text-lg font-bold text-[#0A3A23] transition hover:text-[#D9822B]"
+              >
+                <Phone className="h-4 w-4 text-[#D9822B]" />
+                {brand.phone}
+              </a>
+              <a
+                href={`https://wa.me/${cleanWhatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#0A3A23] px-3 py-2.5 text-xs font-bold text-white transition hover:bg-[#062416]"
+              >
+                <MessageSquare className="h-3.5 w-3.5 text-[#D9822B]" />
+                Message on WhatsApp ↗
+              </a>
+              <p className="text-xs text-gray-500">
+                Office Hours: {brand.officeHours}
+              </p>
+            </Card>
+
+            <Card className="p-6">
+              <h3 className="text-sm font-bold uppercase text-[#0A3A23]">
+                Visit Our Office
+              </h3>
+              <p className="mt-2 text-sm font-medium text-gray-900">
+                {brand.address}
+              </p>
+              <a
+                href={`mailto:${brand.email}`}
+                className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-[#0A3A23] hover:text-[#D9822B] hover:underline"
+              >
+                <Mail className="h-3.5 w-3.5 text-[#D9822B]" />
+                {brand.email}
+              </a>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
@@ -497,7 +501,7 @@ export default function PublicContactAndAssessmentPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-5xl px-4 py-12 text-center text-sm text-slate-500">
+        <div className="mx-auto max-w-5xl px-4 py-12 text-center text-sm text-gray-500">
           Loading contact and assessment form...
         </div>
       }

@@ -38,19 +38,19 @@ export function DashboardNavbar({ user }: { user: StaffUser }) {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-15 items-center justify-between gap-4 border-b border-stone-200/80 bg-white/90 backdrop-blur px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3 min-w-0">
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-gray-200/80 bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
-            className="inline-flex md:hidden items-center justify-center rounded-xl border border-stone-200 p-2 text-slate-600 hover:bg-stone-100"
+            className="inline-flex items-center justify-center rounded-xl border border-gray-200 p-2 text-gray-600 hover:bg-gray-100 md:hidden"
             aria-label="Open navigation menu"
           >
             <Menu className="h-4 w-4" />
           </button>
 
-          <div className="min-w-0 flex items-center gap-1.5 text-xs text-stone-400">
-            <Link href="/dashboard" className="hover:text-teal-700 font-medium">
+          <div className="flex min-w-0 items-center gap-1.5 text-xs text-gray-400">
+            <Link href="/dashboard" className="font-medium hover:text-[#0A3A23]">
               Workspace
             </Link>
             {activeItem && activeItem.href !== '/dashboard' && (
@@ -58,7 +58,7 @@ export function DashboardNavbar({ user }: { user: StaffUser }) {
                 <span>/</span>
                 <Link
                   href={activeItem.href}
-                  className="font-semibold text-slate-800 hover:text-teal-700 truncate"
+                  className="truncate font-semibold text-[#0A3A23] hover:text-[#D9822B]"
                 >
                   {activeItem.title}
                 </Link>
@@ -69,36 +69,36 @@ export function DashboardNavbar({ user }: { user: StaffUser }) {
 
         <form
           onSubmit={handleQuickSearch}
-          className="hidden lg:flex items-center max-w-xs w-full"
+          className="hidden w-full max-w-xs items-center lg:flex"
         >
           <div className="relative w-full">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400" />
+            <Search className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               value={quickQuery}
               onChange={(e) => setQuickQuery(e.target.value)}
               placeholder="Search name, phone, #code..."
-              className="h-9 w-full rounded-xl border border-stone-200 bg-stone-50/80 pl-8 pr-12 text-xs text-slate-800 placeholder:text-stone-400 focus:border-teal-700 focus:bg-white focus:outline-none"
+              className="h-9 w-full rounded-xl border border-gray-200 bg-gray-50/80 pr-12 pl-8 text-xs text-gray-800 placeholder:text-gray-400 focus:border-[#0A3A23] focus:bg-white focus:outline-none"
             />
             <button
               type="submit"
-              className="absolute right-1.5 top-1 bottom-1 rounded-lg px-2 text-[11px] font-semibold text-teal-700 hover:bg-teal-50"
+              className="absolute top-1 right-1.5 bottom-1 rounded-lg px-2 text-[11px] font-bold text-[#0A3A23] hover:bg-[#edf7f1]"
             >
               Find
             </button>
           </div>
         </form>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex shrink-0 items-center gap-2">
           <Link
             href="/my-profile"
-            className="flex items-center gap-2 rounded-xl border border-stone-200/90 bg-stone-50/70 px-2.5 py-1.5 hover:bg-stone-100 transition whitespace-nowrap"
+            className="flex items-center gap-2 whitespace-nowrap rounded-xl border border-gray-200/90 bg-gray-50/70 px-2.5 py-1.5 transition hover:bg-gray-100"
             title={`${user.name} (${user.email})`}
           >
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-700 text-[11px] font-bold text-white">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0A3A23] text-[11px] font-bold text-white">
               {(user.name || 'S').charAt(0).toUpperCase()}
             </div>
-            <span className="hidden sm:inline text-xs font-semibold text-slate-900 max-w-[110px] truncate">
+            <span className="hidden max-w-[110px] truncate text-xs font-semibold text-gray-900 sm:inline">
               {user.name}
             </span>
             <StatusBadge status={user.role} />
@@ -110,35 +110,35 @@ export function DashboardNavbar({ user }: { user: StaffUser }) {
       </header>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex">
+        <div className="fixed inset-0 z-50 flex md:hidden">
           <div
-            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs"
+            className="fixed inset-0 bg-[#062416]/60 backdrop-blur-xs"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="relative z-10 flex w-72 max-w-[85vw] flex-col bg-slate-900 text-slate-200 shadow-xl">
-            <div className="flex h-15 items-center justify-between px-5 border-b border-slate-800">
-              <Logo href="/dashboard" inverted />
+          <div className="relative z-10 flex w-72 max-w-[85vw] flex-col bg-[#062416] text-slate-200 shadow-xl">
+            <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
+              <Logo href="/dashboard" inverted size="sm" />
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="p-3 border-b border-slate-800">
+            <div className="border-b border-white/10 p-3">
               <Link
                 href="/dashboard/leads/create"
                 onClick={() => setMobileOpen(false)}
-                className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-teal-700 px-3 py-2 text-xs font-semibold text-white"
+                className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#D9822B] px-3 py-2 text-xs font-bold text-white"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>New Customer Inquiry</span>
               </Link>
             </div>
 
-            <div className="no-scrollbar flex-1 overflow-y-auto p-3 space-y-1">
+            <div className="no-scrollbar flex-1 space-y-1 overflow-y-auto p-3">
               {visibleItems.map((item) => {
                 const isActive = item.exact
                   ? pathname === item.href
@@ -152,11 +152,14 @@ export function DashboardNavbar({ user }: { user: StaffUser }) {
                     className={cn(
                       'flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-medium',
                       isActive
-                        ? 'bg-teal-700/25 text-teal-200 font-semibold'
-                        : 'text-slate-400 hover:bg-slate-800',
+                        ? 'bg-[#0A3A23] font-semibold text-[#F7D29E]'
+                        : 'text-slate-300 hover:bg-white/10',
                     )}
                   >
-                    <NavIcon name={item.icon} />
+                    <NavIcon
+                      name={item.icon}
+                      className={isActive ? 'text-[#D9822B]' : 'text-slate-400'}
+                    />
                     <span>{item.title}</span>
                   </Link>
                 );

@@ -27,11 +27,16 @@ export default async function PublicHomePage() {
       <HeroSection />
 
       {/* Featured Tour & Hajj Packages */}
-      <section className="py-16 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-            Featured Tour & Hajj Packages
-          </h2>
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <span className="inline-block rounded-full bg-[#FEF3E2] px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-[#BF6F1E]">
+              Curated Journeys
+            </span>
+            <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#0A3A23] sm:text-3xl">
+              Featured Tour &amp; Hajj Packages
+            </h2>
+          </div>
           <Link href="/packages">
             <Button variant="outline">View All Packages →</Button>
           </Link>
@@ -44,15 +49,15 @@ export default async function PublicHomePage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-12 text-center">
-            <h3 className="text-base font-semibold text-slate-800">
+          <div className="rounded-2xl border border-dashed border-[#0A3A23]/25 bg-white p-12 text-center">
+            <h3 className="text-lg font-bold text-[#0A3A23]">
               Packages Are Being Updated
             </h3>
-            <p className="mt-1 text-sm text-stone-500">
+            <p className="mt-1 text-sm text-gray-500">
               Need a custom holiday, Hajj, or visa quote right now? Request one directly.
             </p>
             <Link href="/contact" className="mt-4 inline-block">
-              <Button variant="secondary" size="sm">
+              <Button variant="gold" size="sm">
                 Request Custom Quote →
               </Button>
             </Link>
@@ -62,12 +67,17 @@ export default async function PublicHomePage() {
 
       {/* Popular Visa & Immigration Destinations Preview */}
       {countries.length > 0 && (
-        <section className="py-14 bg-[#FAF9F6] border-t border-stone-200">
+        <section className="border-t border-gray-200/80 bg-[#F0F7F3] py-14">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-                Popular Visa Destinations
-              </h2>
+            <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <span className="inline-block rounded-full border border-[#0A3A23]/20 bg-white px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-[#0A3A23]">
+                  Visa Checklists
+                </span>
+                <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#0A3A23] sm:text-3xl">
+                  Popular Visa Destinations
+                </h2>
+              </div>
               <Link href="/visa-services">
                 <Button variant="outline">All Countries →</Button>
               </Link>
@@ -78,25 +88,25 @@ export default async function PublicHomePage() {
                 <Link
                   key={country.id}
                   href={`/visa-services/${country.slug}`}
-                  className="group flex items-center justify-between rounded-2xl border border-stone-200/90 bg-white p-4 shadow-2xs transition hover:border-teal-400 hover:shadow-sm"
+                  className="group flex items-center justify-between rounded-2xl border border-gray-200/90 bg-white p-4 shadow-xs transition hover:-translate-y-0.5 hover:border-[#0A3A23] hover:shadow-md"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-[#FAF9F6] text-xs font-bold uppercase text-stone-700">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#0A3A23]/15 bg-[#edf7f1] text-xs font-bold uppercase text-[#0A3A23]">
                       {country.isoCode || country.name.slice(0, 2)}
                     </span>
                     <div className="min-w-0">
-                      <p className="font-bold text-slate-900 group-hover:text-teal-700 truncate">
+                      <p className="truncate font-bold text-[#0A3A23] group-hover:text-[#D9822B]">
                         {country.name}
                       </p>
-                      <p className="text-xs text-stone-500">
+                      <p className="text-xs text-gray-500">
                         {country.visaServices?.length || 0} Visa Program
                         {(country.visaServices?.length || 0) === 1 ? '' : 's'} Available
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  <div className="flex shrink-0 flex-col items-end gap-1.5">
                     <CountryCoverageBadge status={country.coverageStatus} />
-                    <span className="text-[11px] font-semibold text-teal-700 group-hover:translate-x-0.5 transition">
+                    <span className="text-[11px] font-bold text-[#0A3A23] transition group-hover:translate-x-0.5 group-hover:text-[#D9822B]">
                       View Checklist →
                     </span>
                   </div>
